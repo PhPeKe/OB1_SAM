@@ -54,7 +54,7 @@ def reading_simulation(filename):
 
     # load dicts for threshold
     # word_freq_dict, word_pred_values = get_freq_pred_files()
-    word_freq_dict = pkl.load(open("Data/nederlands/word_freq.pkl"))
+    word_freq_dict = pkl.load(open("Data/nederlands/freq.pkl"))
     word_pred_values = np.ones(len(textsplitbyspace))
     word_pred_values[:] = 0.1
 

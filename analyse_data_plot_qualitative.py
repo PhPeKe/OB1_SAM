@@ -3,6 +3,7 @@ __author__ = 'Sam van Leipsig'
 import pandas as pd
 import pickle
 import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
 import numpy as np
@@ -11,7 +12,8 @@ import pdb
 
 def get_neighbor_data(df_alldata_no_regr):
     ## Fix dur by neighborhoodsize
-    output_neighbors = 'Data/individualwords_neighbors.dat'
+    ## UPDATED this to the clean version
+    output_neighbors = 'Data/individualwords_neighbors_cleaned.dat'
     with open( output_neighbors,"r") as b:
         individual_words_neighbors = pickle.load(b)
     df_alldata_to_group2 = df_alldata_no_regr[['fixation duration','word length','foveal word text index','word frequency']]

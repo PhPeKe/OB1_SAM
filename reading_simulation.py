@@ -16,7 +16,7 @@ from speed_testing import bigram_activation, bigram_activation_set, bigram_activ
 import pdb
 import numpy as np
 from numpy import testing
-import pickle as pkl
+import pickle
 import parameters as pm
 import sys
 if pm.visualise:
@@ -34,7 +34,8 @@ def reading_simulation(filename):
     # function input, filename, should be a string of the exact textfile name and path.
     #textfile = get_stimulus_text_from_file(filename)
     #textsplitbyspace = textfile.split(" ")
-    textsplitbyspace = pkl.load(open("Data/nederlands/words_dutch.pkl"))
+    textsplitbyspace = pickle.load(open("Data/nederlands/words_dutch.pkl"))
+#    textsplitbyspace = textsplitbyspace[:1000]
     for word in textsplitbyspace:
         if word.strip()!="":
             new_word = unicode(word.strip())  # make sure words are unicode (numpy.unicode_ can cause errors)
@@ -54,10 +55,10 @@ def reading_simulation(filename):
 
     # load dicts for threshold
     # word_freq_dict, word_pred_values = get_freq_pred_files()
-    word_freq_dict = pkl.load(open("Data/nederlands/freq.pkl"))
+    word_freq_dict = pickle.load(open("Data/nederlands/freq.pkl"))
     word_pred_values = np.ones(len(textsplitbyspace))
     word_pred_values[:] = 0.1
-
+    pickle.dump([word_freq_dict,word_pred_values],open("Data/freq_pred.pkl", "w"))
     max_frequency_key = max(word_freq_dict, key=word_freq_dict.get)
     max_frequency = word_freq_dict[max_frequency_key]
     word_pred_values = word_pred_values[0:len(individual_words)]
@@ -111,8 +112,8 @@ def reading_simulation(filename):
     print "size lexicon after freq: "+str(len(lexicon))
     lexicon_file_name = 'Data/Lexicon.dat'
     with open(lexicon_file_name,"w") as f:
-        pkl.dump(lexicon, f)
-
+        pickle.dump(lexicon, f)
+    f.close()
     #sort alphabetically ... for debugging purposes (doesn't affect simulation)
     lexicon.sort()
 

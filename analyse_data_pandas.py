@@ -47,7 +47,16 @@ def get_results(input_text_filename,input_file_all_data,input_file_unrecognized_
                     if word.strip()!="":
                         individual_words.append(word.strip())
                 df_individual_words = pd.DataFrame(individual_words)
-                df_freq_pred = pd.DataFrame(exp.get_freq_and_pred())
+
+                df_freq_pred = pickle.load(open("Data/nederlands/freq500_2.pkl","r"))  # TODO pd.DataFrame(exp.get_freq_and_pred()) ##Throws an error
+                df_freq_pred = pd.DataFrame.from_dict(df_freq_pred, orient="index", columns=["freq"])
+                df_freq_pred["pred"] = np.zeros(len(df_freq_pred))
+                df_freq_pred["pred"][:] = 0.1
+                df_freq_pred["word"] = df_freq_pred.index
+                df_freq_pred.index = range(0,len(df_freq_pred))
+                print(df_freq_pred)
+                # TODO fix
+                import copy_reg
                 df_freq_pred = df_freq_pred.iloc[0:len(df_individual_words),:]
                 df_individual_words = pd.concat([df_individual_words,df_freq_pred],axis=1,join_axes=[df_individual_words.index])
                 df_individual_words = df_individual_words.drop(['word'],1)
@@ -101,6 +110,8 @@ def get_results(input_text_filename,input_file_all_data,input_file_unrecognized_
 
             ## Qualitative effects
             df_alldata_grouped_neighbors = mod2.get_neighbor_data(df_alldata_no_regr)
+            ## This threw an error so I used this fix to repair the file:
+            ## https://stackoverflow.com/questions/556269/importerror-no-module-named-copy-reg-pickle/53942341#53942341
             mod2.plot_GD_byneighbors(df_alldata_grouped_neighbors,neighborbins)
             if pm.use_boundary_task:
                 ## Boundary task

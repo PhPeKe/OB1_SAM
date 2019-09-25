@@ -16,19 +16,22 @@ filepath_psc = "PSC/" + filename + ".txt"
 # p = pstats.Stats(profile_save)
 # p.sort_stats('cumtime').print_stats(50)
 
-(lexicon,all_data, unrecognized_words) = reading_simulation(filepath_psc)
+##(lexicon,all_data, unrecognized_words) = reading_simulation(filepath_psc)
 
 output_file_all_data, output_file_unrecognized_words = ("Results/all_data.pkl","Results/unrecognized.pkl")
 #with open(output_file_all_data,"wb") as f:
 #    pickle.dump(all_data,f)
 #f.close()
-all_data_file = open(output_file_all_data,"w")
-pickle.dump(all_data, all_data_file)
-all_data_file.close()
+##all_data_file = open(output_file_all_data,"w")
+##pickle.dump(all_data, all_data_file)
+##all_data_file.close()
 
-unrecognized_file = open(output_file_unrecognized_words, "w")
-pickle.dump(unrecognized_words, unrecognized_file)
-unrecognized_file.close()
+##unrecognized_file = open(output_file_unrecognized_words, "w")
+##pickle.dump(unrecognized_words, unrecognized_file)
+##unrecognized_file.close()
+
+
+
 #actual_data = pickle.load(open("Results.dat", "r"))
 
 #with open(output_file_unrecognized_words,"w") as f:

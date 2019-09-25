@@ -1,7 +1,7 @@
 __author__ = 'Sam van Leipsig'
 
 import matplotlib
-#matplotlib.use("Agg")
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import stats
@@ -49,7 +49,7 @@ def get_results(input_text_filename,input_file_all_data,input_file_unrecognized_
                 df_individual_words = pd.DataFrame(individual_words)
 
                 #df_freq_pred = pickle.load(open("Data/nederlands/freq500_2.pkl","r"))  # TODO 
-                pd.DataFrame(exp.get_freq_and_pred()) ##Throws an error
+                df_freq_pred = exp.get_freq_and_pred() ##Throws an error
                 #df_freq_pred = pd.DataFrame.from_dict(df_freq_pred, orient="index", columns=["freq"])
                 #df_freq_pred["pred"] = np.zeros(len(df_freq_pred))
                 #df_freq_pred["pred"][:] = 0.1

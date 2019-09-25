@@ -32,9 +32,9 @@ def reading_simulation(filename):
     individual_words = []
 
     # function input, filename, should be a string of the exact textfile name and path.
-    #textfile = get_stimulus_text_from_file(filename)
-    #textsplitbyspace = textfile.split(" ")
-    textsplitbyspace = pickle.load(open("Data/nederlands/words_dutch.pkl"))
+    textfile = get_stimulus_text_from_file(filename)
+    textsplitbyspace = textfile.split(" ")
+#    textsplitbyspace = pickle.load(open("Data/nederlands/words_dutch.pkl"))
 #    textsplitbyspace = textsplitbyspace[:1000]
     for word in textsplitbyspace:
         if word.strip()!="":
@@ -54,11 +54,11 @@ def reading_simulation(filename):
         
 
     # load dicts for threshold
-    # word_freq_dict, word_pred_values = get_freq_pred_files()
-    word_freq_dict = pickle.load(open("Data/nederlands/freq.pkl"))
-    word_pred_values = np.ones(len(textsplitbyspace))
-    word_pred_values[:] = 0.1
-    pickle.dump([word_freq_dict,word_pred_values],open("Data/freq_pred.pkl", "w"))
+    word_freq_dict, word_pred_values = get_freq_pred_files()
+#    word_freq_dict = pickle.load(open("Data/nederlands/freq.pkl"))
+#    word_pred_values = np.ones(len(textsplitbyspace))
+#    word_pred_values[:] = 0.1
+#    pickle.dump([word_freq_dict,word_pred_values],open("Data/freq_pred.pkl", "w"))
     max_frequency_key = max(word_freq_dict, key=word_freq_dict.get)
     max_frequency = word_freq_dict[max_frequency_key]
     word_pred_values = word_pred_values[0:len(individual_words)]

@@ -1,5 +1,4 @@
 # CHANGED
-
 from reading_simulation import reading_simulation
 from reading_simulation_BT import reading_simulation_BT
 from analyse_data_pandas import get_results
@@ -7,52 +6,34 @@ from create_name import create_name_josh
 import pickle
 import cProfile
 import pstats
+import time
+from get_scores import get_scores
+
+run_exp = True # Should be "run" or "test"
+analyze_results = False
+save_results = True
+optimize = True
 
 filename = "PSC_ALL"
 filepath_psc = "PSC/" + filename + ".txt"
-
-# profile_save = 'Profile_stats/myprofile_monogramactivations.stats'
-# profile = cProfile.run('reading_simulation(filepath_psc)',profile_save)
-# p = pstats.Stats(profile_save)
-# p.sort_stats('cumtime').print_stats(50)
-
-##(lexicon,all_data, unrecognized_words) = reading_simulation(filepath_psc)
-
 output_file_all_data, output_file_unrecognized_words = ("Results/all_data.pkl","Results/unrecognized.pkl")
-#with open(output_file_all_data,"wb") as f:
-#    pickle.dump(all_data,f)
-#f.close()
-##all_data_file = open(output_file_all_data,"w")
-##pickle.dump(all_data, all_data_file)
-##all_data_file.close()
+start_time = time.time()
 
-##unrecognized_file = open(output_file_unrecognized_words, "w")
-##pickle.dump(unrecognized_words, unrecognized_file)
-##unrecognized_file.close()
+if run_exp:
+	(lexicon,all_data, unrecognized_words) = reading_simulation(filepath_psc)
+	if save_results:
+		all_data_file = open(output_file_all_data,"w")
+		pickle.dump(all_data, all_data_file)
+		all_data_file.close()
 
+		unrecognized_file = open(output_file_unrecognized_words, "w")
+		pickle.dump(unrecognized_words, unrecognized_file)
+		unrecognized_file.close()
 
-
-#actual_data = pickle.load(open("Results.dat", "r"))
-
-#with open(output_file_unrecognized_words,"w") as f:
-#    pickle.dump(unrecognized_words,f)
-#with open(r"Results.dat","rb") as f:
-#    actual_data = pickle.load(f)
-#f.close()
-
-#with open("C:\Users\Josh\Desktop\josh work\Experiments\BOB\sam reading model july15\sam reading model july15\unrecognized.txt") as f:
-#    for i in range(0,len(unrecognized_words)):
-#        f.write(str(unrecognized_words[i]))
-#f.close()
-#with open("Raw_BT_data/new_normal_data_test.txt", "w") as g:
-#   for i in range(0,len(actual_data)):
-#       g.write(str(actual_data[i]))
-#g.close()
-
-get_results(filename,output_file_all_data,output_file_unrecognized_words)
-
-
-#with open("C:\\Users\\Josh\\Desktop\\josh work\\Experiments\\BOB\\sam reading model july15\\sam reading model july15\\Raw_BT_data\\boundary_data.txt", "w") as g:
-#   g.write(df_GD_boundary_task_POF)
-#g.close()
-       
+if analyze_results:
+	get_results(filename,output_file_all_data,output_file_unrecognized_words)
+if optimize:
+	distance = get_scores(filename,output_file_all_data,output_file_unrecognized_words)
+time_elapsed = time.time()-start_time
+print("Time elapsed: "+str(time_elapsed))
+print("Total distance: "+str(distance))

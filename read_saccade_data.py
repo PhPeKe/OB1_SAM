@@ -8,6 +8,7 @@ import pandas as pd
 from pandas import HDFStore
 import os.path
 import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pdb
 import parameters as pm

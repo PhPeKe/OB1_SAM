@@ -19,6 +19,7 @@ from numpy import testing
 import pickle
 import parameters as pm
 import sys
+import io
 if pm.visualise:
     import Visualise_reading
 
@@ -446,7 +447,12 @@ def reading_simulation(filename):
         # At this point, stimulus, bigrams and weights for the current stimulus are defined. Now prepare for entering
         # the cycle-loop that builds word activity with every cycle.
         my_print("fixation: ",individual_words[fixation])
-        my_print("stimulus: ",stimulus)
+	try:
+	        with open("bot.txt","w") as f:
+			f.write("Word number "+str(fixation)+": "+unicode(str(individual_words[fixation])))
+	except:
+		print("woops")
+	my_print("stimulus: ",stimulus)
         #print 'EyePostition:',EyePosition
         
         amount_of_cycles = 0

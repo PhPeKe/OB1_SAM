@@ -138,7 +138,7 @@ def make_word_measures_bylength(df_alldata):
         complete_threshold_matrix[i,:] = array[:,4]
         complete_realactivity_matrix[i,:] = array[:,5]
         complete_decay_matrix[i,:] = array[:,6]
-    df_only_word_activity = pd.DataFrame(complete_activity_matrix)
+    df_only_word_activity = pd.DataFrame(complete_activity_matrix, dtype=float)
     df_only_word_activity = df_only_word_activity.loc[:,(df_only_word_activity.any(axis=0)!=0)]
     df_only_word_activity.replace(0.0, np.nan)
     df_only_word_activity = pd.concat([df_only_word_activity,df_alldata['word length']], axis=1, join_axes=[df_only_word_activity.index])
@@ -147,31 +147,31 @@ def make_word_measures_bylength(df_alldata):
 
     for i in xrange(len(complete_threshold_matrix[0,:])):
         complete_threshold_matrix[:,i] = complete_threshold_matrix[:,0]
-    df_only_word_threshold = pd.DataFrame(complete_threshold_matrix)
+    df_only_word_threshold = pd.DataFrame(complete_threshold_matrix, dtype=float)
     df_only_word_threshold = pd.concat([df_only_word_threshold, df_alldata['word length']], axis=1, join_axes=[df_only_word_threshold.index])
     df_only_word_threshold = df_only_word_threshold.loc[:,(df_only_word_threshold.any(axis=0)!=0)]
     word_measures_dict['threshold'] = df_only_word_threshold.groupby('word length').mean()
     #df_only_word_threshold_grpby_length = df_only_word_threshold.groupby('word length').mean()
 
-    df_only_word_excitation = pd.DataFrame(complete_excitation_matrix)
+    df_only_word_excitation = pd.DataFrame(complete_excitation_matrix, dtype=float)
     df_only_word_excitation = pd.concat([df_only_word_excitation,df_alldata['word length']], axis=1, join_axes=[df_only_word_excitation.index])
     df_only_word_excitation = df_only_word_excitation.loc[:,(df_only_word_excitation.any(axis=0)!=0)]
     word_measures_dict['excitation'] = df_only_word_excitation.groupby('word length').mean()
     #df_only_word_excitation_grpby_length = df_only_word_excitation.groupby('word length').mean()
 
-    df_only_word_inhibition = pd.DataFrame(complete_inhibition_matrix)
+    df_only_word_inhibition = pd.DataFrame(complete_inhibition_matrix, dtype=float)
     df_only_word_inhibition = pd.concat([df_only_word_inhibition,df_alldata['word length']], axis=1, join_axes=[df_only_word_inhibition.index])
     df_only_word_inhibition = df_only_word_inhibition.loc[:,(df_only_word_inhibition.any(axis=0)!=0)]
     #word_measures_dict['inhibition'] = df_only_word_inhibition.groupby('word length').mean()
     #df_only_word_inhibition_grpby_length = df_only_word_inhibition.groupby('word length').mean()
 
-    df_only_word_realactivity = pd.DataFrame(complete_realactivity_matrix)
+    df_only_word_realactivity = pd.DataFrame(complete_realactivity_matrix, dtype=float)
     df_only_word_realactivity = pd.concat([df_only_word_realactivity,df_alldata['word length']], axis=1, join_axes=[df_only_word_realactivity.index])
     df_only_word_realactivity = df_only_word_realactivity.loc[:,(df_only_word_realactivity.any(axis=0)!=0)]
     word_measures_dict['realactivation'] = df_only_word_realactivity.groupby('word length').mean()
     #df_only_word_realactivity_grpby_length = df_only_word_realactivity.groupby('word length').mean()
 
-    df_only_word_decay = pd.DataFrame(complete_decay_matrix)
+    df_only_word_decay = pd.DataFrame(complete_decay_matrix, dtype=float)
     df_only_word_decay = pd.concat([df_only_word_decay,df_alldata['word length']], axis=1, join_axes=[df_only_word_decay.index])
     df_only_word_decay = df_only_word_decay.loc[:,(df_only_word_decay.any(axis=0)!=0)]
     word_measures_dict['decay'] = df_only_word_decay.groupby('word length').mean()

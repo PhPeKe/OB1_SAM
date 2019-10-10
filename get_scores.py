@@ -1,6 +1,7 @@
-__author__ = 'Sam van Leipsig'
+__author__ = 'Phillip Kersten, adapted from Sam van Leipsig'
 
 import matplotlib
+from time import time
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,11 +16,11 @@ import parameters as pm
 
 
 
-def get_scores(input_text_filename,input_file_all_data,input_file_unrecognized_words):
-    with open(input_file_all_data,"r") as f:
-        all_data = pickle.load(f)
-    with open(input_file_unrecognized_words,"r") as g:
-        unrecognized_words = pickle.load(g)
+def get_scores(input_text_filename,all_data,unrecognized_words):
+#    with open(input_file_all_data,"r") as f:
+#        all_data = pickle.load(f)
+#    with open(input_file_unrecognized_words,"r") as g:
+#        unrecognized_words = pickle.load(g)
     ## Parameters
     freqbins  = np.arange(-0.0,8,2.0)
     predbins = np.arange(-0.0,1.01,0.333)
@@ -121,6 +122,11 @@ def get_scores(input_text_filename,input_file_all_data,input_file_unrecognized_w
              "Second fixation duration",
              "Regression"
              ]
+    plt.close()
+    fig, ax = plt.subplots(2, 3, sharex='col', sharey='row')
+    ax = ax.ravel()
+    legends = []
+    i = 0
     for sim_, exp_, name in zip(simulation,experiment, names):
 
         min_ = min([exp_.min(), sim_.min()])
@@ -141,12 +147,16 @@ def get_scores(input_text_filename,input_file_all_data,input_file_unrecognized_w
         total_distance += sum(map(lambda x: abs(x[0]-x[1]), zip(Z_x,Z_y)))
         distances[name] = sum(map(lambda x: abs(x[0]-x[1]), zip(Z_x,Z_y)))
         plot = True
+	t = time()
         if plot:
-            plt.close()
-            plt.plot(Z_x)
-            plt.plot(Z_y)
-            plt.title("distance: "+str(round(distances[name],5)))
-            plt.suptitle("KDE for: "+name)
-            plt.legend(["Simulation", "Experiment"])
-            plt.savefig("test_density"+name+".png")
+            #plt.subplot(2, 3, i)
+            ax[i].set_ylim(0,0.01)
+            line_x = ax[i].plot(Z_x)
+            line_y = ax[i].plot(Z_y)
+            ax[i].set_title(name+": \n"+str(round(distances[name],3)))
+            # ax[x,y].suptitle("KDE for: "+name)
+            i += 1
+    plt.figlegend((line_x, line_y), ("Simulation", "Experiment"), loc='upper-right')  # ["Simulation", "Experiment"])
+    fig.suptitle("Total distance: "+str(total_distance))
+    plt.savefig("test_density"+str(int(t))+".png", dpi=300)
     return total_distance

@@ -26,7 +26,30 @@ if pm.visualise:
 
 ##TODO calling dictionary with string is slightly faster than with integer!, for clarity use string/word in dictionaries
 
-def reading_simulation(filename):
+def reading_simulation(filename, parameters):
+
+    pm.decay = parameters[0]
+    pm.bigram_to_word_excitation = parameters[1]
+    pm.bigram_to_word_inhibition = parameters[2]
+    pm.word_inhibition = parameters[3]
+    pm.max_activity = parameters[4]
+    pm.max_attend_width = int(parameters[5])
+    pm.min_attend_width = int(parameters[6])
+    pm.attention_skew = parameters[7]
+    pm.bigram_gap = int(parameters[8])
+    pm.min_overlap = int(parameters[9])
+    pm.refix_size = parameters[10]
+    pm.salience_position = parameters[11]
+    pm.sacc_optimal_distance = parameters[12]
+    pm.saccErr_scaler = parameters[13]
+    pm.saccErr_sigma = abs(parameters[14])
+    pm.saccErr_sigma_scaler = parameters[15]
+    pm.mu = parameters[16]
+    pm.sigma = parameters[17]
+    pm.distribution_param = parameters[18]
+    pm.wordfreq_p = parameters[19]
+    pm.wordpred_p = parameters[20]
+
 
     lexicon = []
     all_data = []
@@ -318,7 +341,10 @@ def reading_simulation(filename):
         # ##Test the allocation
         my_print( "ALLOCATED:",already_allocated,allocated_dict.keys())
         for i in already_allocated:
-            print lexicon[i],
+            try:
+                print lexicon[i]
+            except:
+                print "Escaping annoying encoding error while printing"
             if not regression and i == individual_to_lexicon_indices[fixation]:
                 N_in_allocated += 1
                 to_pauze = True

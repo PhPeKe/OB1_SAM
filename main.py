@@ -82,6 +82,12 @@ def reading_function(parameters):
 	filename = "PSC_ALL"
 	filepath_psc = "PSC/" + filename + ".txt"
 	(lexicon,all_data, unrecognized_words) = reading_simulation(filepath_psc, parameters)
+### For testing
+#	with open("Results/all_data.pkl","r") as f:
+#		all_data = pickle.load(f)
+#	with open("Results/unrecognized.pkl","r") as f:
+#		unrecognized_words = pickle.load(f)
+###
 	distance = get_scores(filename,all_data,unrecognized_words)
 	with open("dist.txt","a") as f:
 		f.write("Distance:"+str(distance)+"\n")
@@ -114,7 +120,7 @@ if optimize:
 	results = scipy.optimize.fmin_l_bfgs_b(func=reading_function, x0=np.array(parameters), bounds=bounds, approx_grad=True , disp=True)
 time_elapsed = time.time()-start_time
 with open("results_optimization.pkl","wb") as file:
-	pkl.dump(results, file)
+	pickle.dump(results, file)
 print("Time elapsed: "+str(time_elapsed))
 print("Total distance: "+str(distance))
 

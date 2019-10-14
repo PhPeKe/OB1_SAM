@@ -37,7 +37,7 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
             individual_words.append(word.strip())
     df_individual_words = pd.DataFrame(individual_words)
 
-    df_freq_pred = exp.get_freq_and_pred() ##Throws an error
+    df_freq_pred = exp.get_freq_and_pred()
 
 
     df_freq_pred = df_freq_pred.iloc[0:len(df_individual_words),:]
@@ -56,7 +56,7 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
     df_alldata_no_regr = df_alldata[(df_alldata['regressed']==False)]  ## There are no refixations after a regression!
 
     ## Word measures by cycle, grouped by word length
-    word_measures_bylen_dict = trans.make_word_measures_bylength(df_alldata)
+    # not necessary??  # word_measures_bylen_dict = trans.make_word_measures_bylength(df_alldata)
     df_alldata = df_alldata.drop(['fixation word activities np'],1)
     df_alldata_no_regr['foveal word text index2'] = df_alldata_no_regr['foveal word text index']
     df_SF = df_alldata_no_regr.groupby(['foveal word text index']).filter(lambda x: len(x)==1)
@@ -156,7 +156,7 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
             ax[i].set_title(name+": \n"+str(round(distances[name],3)))
             # ax[x,y].suptitle("KDE for: "+name)
             i += 1
-    plt.figlegend((line_x, line_y), ("Simulation", "Experiment"), loc='upper-right')  # ["Simulation", "Experiment"])
+    plt.figlegend(handles=[line_x, line_y], labels=["Simulation", "Experiment"], loc='upper-right')  # ["Simulation", "Experiment"])
     fig.suptitle("Total distance: "+str(total_distance))
     plt.savefig("test_density"+str(int(t))+".png", dpi=300)
     return total_distance

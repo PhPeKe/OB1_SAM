@@ -79,6 +79,8 @@ def make_number_fixations(df_alldata_no_regr):
         df_refixations_grouped = df_refixations.groupby(['foveal word text index'])
         first_fixation_selection_exclusive =  df_refixations_grouped.apply(lambda x: x.index[0]).values
         second_fixation_selection = df_refixations_grouped.apply(lambda x: x.index[1]).values
+	print("------------df  fixation locations------------------")
+	print(df_fixation_durations)
         df_first_fixation_exclusive = df_fixation_durations.loc[first_fixation_selection_exclusive,:]
         df_second_fixation = df_fixation_durations.loc[second_fixation_selection,:]
 

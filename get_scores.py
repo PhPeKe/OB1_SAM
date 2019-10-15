@@ -136,6 +136,10 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
         positions = X.ravel()
         values_x = sim_
         values_y = exp_
+	print("-----------------Kernel x------------------")
+	print(values_x)
+	print("-----------------Kernel y------------------")
+	print(values_y)
         kernel_x = stats.gaussian_kde(values_x)
         kernel_y = stats.gaussian_kde(values_y)
         # Set bandwidth like in the original plotting method

@@ -44,9 +44,12 @@ def get_exp_data():
     return saccade_data
 
 def read_exp_data():
-    filename = 'Data/Fixation_durations_complete.hdf'
-    if os.path.isfile('Data/Fixation_durations_complete.hdf'):
-        return pd.read_hdf('Data/Fixation_durations_complete.hdf','complete')
+    if pm.language == "german":
+        filename = 'Data/Fixation_durations_complete.hdf'
+    if pm.language == "dutch":
+        filename = 'Data/Fixation_durations_dutch.hdf'
+    if os.path.isfile(filename):
+        return pd.read_hdf(filename, 'complete')
     else:
         return get_exp_data()
 

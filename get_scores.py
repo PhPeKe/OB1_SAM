@@ -14,7 +14,8 @@ import read_saccade_data as exp
 import analyse_data_transformation as trans
 import parameters as pm
 
-
+def kl_divergence(p, q):
+    return np.sum(np.where(p != 0, p * np.log(p / q), 0))
 
 def get_scores(input_text_filename,all_data,unrecognized_words):
 #    with open(input_file_all_data,"r") as f:
@@ -101,6 +102,7 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
     ## Get distance between curves in plot
     total_distance = 0
     distances = {}
+    divergences = {}
     simulation = [total_viewing_time["fixation duration"],
                   gaze_durations['fixation duration'],
                   df_single_fixations['fixation duration'],
@@ -140,8 +142,13 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
 	print(values_x)
 	print("-----------------Kernel y------------------")
 	print(values_y)
-        kernel_x = stats.gaussian_kde(values_x)
-        kernel_y = stats.gaussian_kde(values_y)
+	# Workaround to make parametertuning possible in case there is no data because e.g. no regressions have been made
+	try:
+	        kernel_x = stats.gaussian_kde(values_x)
+        except:
+		print("Error: empty dataframe for "+name+"replacing x with inverse y")
+		kernel_x = stats.gaussian_kde(-values_y)
+	kernel_y = stats.gaussian_kde(values_y)
         # Set bandwidth like in the original plotting method
         band_width = 0.31
         kernel_x.set_bandwidth(band_width)
@@ -150,6 +157,7 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
         Z_y = np.reshape(kernel_y(positions).T, X.shape)
         total_distance += sum(map(lambda x: abs(x[0]-x[1]), zip(Z_x,Z_y)))
         distances[name] = sum(map(lambda x: abs(x[0]-x[1]), zip(Z_x,Z_y)))
+        divergences[name] = kl_divergence(Z_x,Z_y)
         plot = True
 	t = time()
         if plot:
@@ -157,10 +165,11 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
             ax[i].set_ylim(0,0.01)
             line_x = ax[i].plot(Z_x)
             line_y = ax[i].plot(Z_y)
-            ax[i].set_title(name+": \n"+str(round(distances[name],3)))
+            ax[i].set_title(name+": \n"+str(round(distances[name],3))+" / "+str(round(divergences[name], 3)))
             # ax[x,y].suptitle("KDE for: "+name)
             i += 1
     plt.figlegend(handles=[line_x, line_y], labels=["Simulation", "Experiment"], loc='upper-right')  # ["Simulation", "Experiment"])
     fig.suptitle("Total distance: "+str(total_distance))
+    fig.tight_layout()
     plt.savefig("test_density"+str(int(t))+".png", dpi=300)
     return total_distance

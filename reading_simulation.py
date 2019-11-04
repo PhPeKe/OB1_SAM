@@ -26,29 +26,29 @@ if pm.visualise:
 
 ##TODO calling dictionary with string is slightly faster than with integer!, for clarity use string/word in dictionaries
 
-def reading_simulation(filename, parameters):
+def reading_simulation(filename): #, parameters):
 
-    pm.decay = parameters[0]
-    pm.bigram_to_word_excitation = parameters[1]
-    pm.bigram_to_word_inhibition = parameters[2]
-    pm.word_inhibition = parameters[3]
-    pm.max_activity = parameters[4]
-    pm.max_attend_width = int(parameters[5])
-    pm.min_attend_width = int(parameters[6])
-    pm.attention_skew = parameters[7]
-    pm.bigram_gap = int(parameters[8])
-    pm.min_overlap = int(parameters[9])
-    pm.refix_size = parameters[10]
-    pm.salience_position = parameters[11]
-    pm.sacc_optimal_distance = parameters[12]
-    pm.saccErr_scaler = parameters[13]
-    pm.saccErr_sigma = abs(parameters[14])
-    pm.saccErr_sigma_scaler = parameters[15]
-    pm.mu = parameters[16]
-    pm.sigma = parameters[17]
-    pm.distribution_param = parameters[18]
-    pm.wordfreq_p = parameters[19]
-    pm.wordpred_p = parameters[20]
+#    pm.decay = parameters[0]
+#    pm.bigram_to_word_excitation = parameters[1]
+#    pm.bigram_to_word_inhibition = parameters[2]
+#    pm.word_inhibition = parameters[3]
+#    pm.max_activity = parameters[4]
+#    pm.max_attend_width = int(parameters[5])
+#    pm.min_attend_width = int(parameters[6])
+#    pm.attention_skew = parameters[7]
+#    pm.bigram_gap = int(parameters[8])
+#    pm.min_overlap = int(parameters[9])
+#    pm.refix_size = parameters[10]
+#    pm.salience_position = parameters[11]
+#    pm.sacc_optimal_distance = parameters[12]
+#    pm.saccErr_scaler = parameters[13]
+#    pm.saccErr_sigma = abs(parameters[14])
+#    pm.saccErr_sigma_scaler = parameters[15]
+#    pm.mu = parameters[0]
+#    pm.sigma = parameters[1]
+#    pm.distribution_param = parameters[18]
+#    pm.wordfreq_p = parameters[19]
+#    pm.wordpred_p = parameters[20]
 
 
     lexicon = []
@@ -56,32 +56,36 @@ def reading_simulation(filename, parameters):
     individual_words = []
 
     # function input, filename, should be a string of the exact textfile name and path.
-    textfile = get_stimulus_text_from_file(filename)
-    textsplitbyspace = textfile.split(" ")
-#    textsplitbyspace = pickle.load(open("Data/nederlands/words_dutch.pkl"))
-#    textsplitbyspace = textsplitbyspace[:1000]
+    if ".txt" in filename:
+        textfile = get_stimulus_text_from_file(filename)
+        textsplitbyspace = textfile.split(" ")
+    if ".pkl" in filename:
+        textsplitbyspace = pickle.load(open(filename))
+#        textsplitbyspace = textsplitbyspace[:1000]
     for word in textsplitbyspace:
         if word.strip()!="":
             new_word = unicode(word.strip())  # make sure words are unicode (numpy.unicode_ can cause errors)
             individual_words.append(new_word)
     target_words = []
     target_word_sf = []
-    target_word_gd = [] 
+    target_word_gd = []
     target_word_refixs = []
     target_word_act = []
-    
+
 #    with open(r'C:\Users\Josh\Desktop\josh work\Experiments\BOB\sam reading model july15\sam reading model july15\PSC\target_positions.txt') as file:
 #        target_positions = file.readlines()
 #    for i in range(0,len(target_positions)):
 #        target_positions[i] = int(target_positions[i].replace('\n',''))
 #    print target_positions
-        
+
 
     # load dicts for threshold
-    word_freq_dict, word_pred_values = get_freq_pred_files()
-#    word_freq_dict = pickle.load(open("Data/nederlands/freq.pkl"))
-#    word_pred_values = np.ones(len(textsplitbyspace))
-#    word_pred_values[:] = 0.1
+    if pm.language == "german":
+        word_freq_dict, word_pred_values = get_freq_pred_files()
+    if pm.language == "dutch":
+        word_freq_dict = pickle.load(open("Data/nederlands/freq.pkl"))
+        word_pred_values = np.ones(len(textsplitbyspace))
+        word_pred_values[:] = 0.1
 #    pickle.dump([word_freq_dict,word_pred_values],open("Data/freq_pred.pkl", "w"))
     max_frequency_key = max(word_freq_dict, key=word_freq_dict.get)
     max_frequency = word_freq_dict[max_frequency_key]
@@ -132,7 +136,7 @@ def reading_simulation(filename, parameters):
         for freq_word in word_freq_dict.keys():
             if freq_word not in lexicon:
                 lexicon.append(freq_word.lower())
-                
+
     print "size lexicon after freq: "+str(len(lexicon))
     lexicon_file_name = 'Data/Lexicon.dat'
     with open(lexicon_file_name,"w") as f:
@@ -147,7 +151,7 @@ def reading_simulation(filename, parameters):
 
     # Normalize word inhibition to the size of the lexicon. 
     lexicon_normalized_word_inhibition = (100.0/LEXICON_SIZE) * pm.word_inhibition
-            
+
     # Set activation of all words in lexicon to zero and make bigrams for each word.
     lexicon_word_activity = {}
     lexicon_word_bigrams = {}
@@ -190,8 +194,8 @@ def reading_simulation(filename, parameters):
     print ""
 
 #-----------------------------------------------------------------------------------------
-    print "Setting up word-to-word inhibition grid..." 
-    
+    print "Setting up word-to-word inhibition grid..."
+
     # Set up the list of word inhibition pairs, with amount of bigram/monograms overlaps for every pair.
     #initialize inhibition matrix with false
     #word_inhibition_matrix = np.zeros((LEXICON_SIZE,LEXICON_SIZE),dtype=bool)
@@ -256,7 +260,7 @@ def reading_simulation(filename, parameters):
 
     print "Inhibition grid ready."
     print ""
-  #---------------------------------------------------------------------------      
+  #---------------------------------------------------------------------------
     print "BEGIN READING"
     print ""
     print ""

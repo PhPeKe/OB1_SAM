@@ -2,13 +2,16 @@
 
 __author__ = 'Sam van Leipsig'
 print "Parameters Initialised"
-
 ## Word activation
 ## Monoweight = 2
 # decay = -0.047
 # bigram_to_word_excitation = 0.004
 # bigram_to_word_inhibition = -0.0001
 # word_inhibition = -0.0014
+
+language = "dutch"  # german, dutch
+
+print("reading in " + language)
 
 ## Monoweight = 1
 decay = -0.05

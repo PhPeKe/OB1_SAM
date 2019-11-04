@@ -39,22 +39,38 @@ def get_results(input_text_filename,input_file_all_data,input_file_unrecognized_
                 df_individual_words = df_boundary_task
                 df_individual_words.rename(columns={'words':'foveal word','f':'freq'}, inplace=True)
             else:
+
+#                if pm.language == "german":
+#                    word_freq_dict, word_pred_values = get_freq_pred_files()
+#                if pm.language == "dutch":
+#                    word_freq_dict = pickle.load(open("Data/nederlands/freq.pkl"))
+#                    word_pred_values = np.ones(len(textsplitbyspace))
+#                    word_pred_values[:] = 0.1
+
                 ## Get complete psc (add freq and pred)
-                textfile = get_stimulus_text_from_file("PSC/" + input_text_filename + '.txt')
+                # German mode
+                if pm.language == "german":
+                    textfile = get_stimulus_text_from_file(input_text_filename)
+                    textsplitbyspace = textfile.split(" ")
+                # Dutch mode
+                if pm.language == "dutch":
+                    textsplitbyspace = pickle.load(open(input_text_filename))
+
                 individual_words = []
-                textsplitbyspace = textfile.split(" ")
                 for word in textsplitbyspace:
                     if word.strip()!="":
                         individual_words.append(word.strip())
                 df_individual_words = pd.DataFrame(individual_words)
 
-                #df_freq_pred = pickle.load(open("Data/nederlands/freq500_2.pkl","r"))  # TODO 
-                df_freq_pred = exp.get_freq_and_pred() ##Throws an error
-                #df_freq_pred = pd.DataFrame.from_dict(df_freq_pred, orient="index", columns=["freq"])
-                #df_freq_pred["pred"] = np.zeros(len(df_freq_pred))
-                #df_freq_pred["pred"][:] = 0.1
-                #df_freq_pred["word"] = df_freq_pred.index
-                #df_freq_pred.index = range(0,len(df_freq_pred))
+                if pm.language == "german":
+                    df_freq_pred = exp.get_freq_and_pred() ##Throws an error
+                if pm.language == "dutch":
+                    df_freq_pred = pickle.load(open("Data/nederlands/freq500_2.pkl","r"))  # TODO 
+                    df_freq_pred = pd.DataFrame.from_dict(df_freq_pred, orient="index", columns=["freq"])
+                    df_freq_pred["pred"] = np.zeros(len(df_freq_pred))
+                    df_freq_pred["pred"][:] = 0.1
+                    df_freq_pred["word"] = df_freq_pred.index
+                    df_freq_pred.index = range(0,len(df_freq_pred))
                 #print(df_freq_pred)
                 # TODO fix
                 #import copy_reg

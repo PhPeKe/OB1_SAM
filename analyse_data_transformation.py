@@ -144,8 +144,8 @@ def make_word_measures_bylength(df_alldata):
     df_only_word_activity = df_only_word_activity.loc[:,(df_only_word_activity.any(axis=0)!=0)]
     df_only_word_activity.replace(0.0, np.nan)
     df_only_word_activity = pd.concat([df_only_word_activity,df_alldata['word length']], axis=1, join_axes=[df_only_word_activity.index])
-    word_measures_dict['activity'] = word_measures_dict['activity'].apply(pd.to_numeric)
     word_measures_dict['activity'] = df_only_word_activity.groupby('word length').apply(pd.to_numeric).mean()
+    word_measures_dict['activity'] = word_measures_dict['activity'].apply(pd.to_numeric)
     #df_only_word_activity_grpby_length = df_only_word_activity.groupby('word length').agg(np.mean)
 
     for i in xrange(len(complete_threshold_matrix[0,:])):

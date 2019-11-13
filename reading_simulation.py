@@ -26,29 +26,30 @@ if pm.visualise:
 
 ##TODO calling dictionary with string is slightly faster than with integer!, for clarity use string/word in dictionaries
 
-def reading_simulation(filename): #, parameters):
+def reading_simulation(filename, parameters):
 
-#    pm.decay = parameters[0]
-#    pm.bigram_to_word_excitation = parameters[1]
-#    pm.bigram_to_word_inhibition = parameters[2]
-#    pm.word_inhibition = parameters[3]
-#    pm.max_activity = parameters[4]
-#    pm.max_attend_width = int(parameters[5])
-#    pm.min_attend_width = int(parameters[6])
-#    pm.attention_skew = parameters[7]
-#    pm.bigram_gap = int(parameters[8])
-#    pm.min_overlap = int(parameters[9])
-#    pm.refix_size = parameters[10]
-#    pm.salience_position = parameters[11]
-#    pm.sacc_optimal_distance = parameters[12]
-#    pm.saccErr_scaler = parameters[13]
-#    pm.saccErr_sigma = abs(parameters[14])
-#    pm.saccErr_sigma_scaler = parameters[15]
-#    pm.mu = parameters[0]
-#    pm.sigma = parameters[1]
-#    pm.distribution_param = parameters[18]
-#    pm.wordfreq_p = parameters[19]
-#    pm.wordpred_p = parameters[20]
+    if any(parameters):
+    #    pm.decay = parameters[0]
+    #    pm.bigram_to_word_excitation = parameters[1]
+    #    pm.bigram_to_word_inhibition = parameters[2]
+    #    pm.word_inhibition = parameters[3]
+    #    pm.max_activity = parameters[4]
+    #    pm.max_attend_width = int(parameters[5])
+    #    pm.min_attend_width = int(parameters[6])
+    #    pm.attention_skew = parameters[7]
+    #    pm.bigram_gap = int(parameters[8])
+    #    pm.min_overlap = int(parameters[9])
+    #    pm.refix_size = parameters[10]
+    #    pm.salience_position = parameters[11]
+    #    pm.sacc_optimal_distance = parameters[12]
+    #    pm.saccErr_scaler = parameters[13]
+    #    pm.saccErr_sigma = abs(parameters[14])
+    #    pm.saccErr_sigma_scaler = parameters[15]
+        pm.mu = parameters[0]
+    #    pm.sigma = parameters[1]
+    #    pm.distribution_param = parameters[18]
+    #    pm.wordfreq_p = parameters[19]
+    #    pm.wordpred_p = parameters[20]
 
 
     lexicon = []
@@ -401,7 +402,7 @@ def reading_simulation(filename): #, parameters):
             stimulus = " "+individual_words[fixation-2]+" "+individual_words[fixation-1]+" "+individual_words[fixation]+" "
             EyePosition = len(individual_words[fixation-2]) + len(individual_words[fixation-1]) +  round(len(individual_words[fixation])*0.5) + 2 + OffsetFromWordCenter
         elif fixation+2 == TOTAL_WORDS:
-            stimulus = " "+individual_words[fixation-2]+" "+individual_words[fixation-1]+" "+individual_words[fixation]+" "+individual_words[fixation+1]+" "            
+            stimulus = " "+individual_words[fixation-2]+" "+individual_words[fixation-1]+" "+individual_words[fixation]+" "+individual_words[fixation+1]+" "
             EyePosition = len(individual_words[fixation-2]) + len(individual_words[fixation-1]) +  round(len(individual_words[fixation])*0.5) + 2 + OffsetFromWordCenter
         elif fixation-2 == 0:
             stimulus = " "+individual_words[fixation-2]+" "+individual_words[fixation-1]+" "+individual_words[fixation]+" "+individual_words[fixation+1]+" "+individual_words[fixation+2]+" "
@@ -435,7 +436,7 @@ def reading_simulation(filename): #, parameters):
         wordskip_pass = 0
 
         my_print('attendWidth',attendWidth)
-   
+
        # These parameters may be set to True if a wordskip or regression needs to be done.
        # This will influence where the eyes move, (see bottom of the code).
         if wordskip == True:
@@ -647,13 +648,13 @@ def reading_simulation(filename): #, parameters):
                         # wordExcitationInput = bigram_activation_set(lexicon_word,allBigrams_set,lexicon_word_bigrams_set,unitActivations)
                         # wordExcitationInput1 = bigram_activation_set_fast(lexicon_word,allBigrams_set,lexicon_word_bigrams_set,unitActivations)
                         # wordExcitationInput2 = bigram_activation_set_fast2(lexicon_word,allBigrams_set,lexicon_word_bigrams_set,unitActivations)
-        
+
                         # ##Speed testing monogram functions, Fastest -> monogram_activation_list
                         # wordExcitationInput1m = monogram_activation_list(lexicon_word,allMonograms,lexicon_word_bigrams,unitActivations)
                         # wordExcitationInput2m = monogram_activation_list2(lexicon_word,allMonograms_set,lexicon_word_bigrams,unitActivations)
                         # wordExcitationInput3m = monogram_activation_set(lexicon_word,allMonograms_set,lexicon_word_bigrams,unitActivations)
                         ## could use numpy, lexicon as numpy.char and np.intersect1d
-        
+
                         ## (Fast) Bigram & Monogram activations
                         bigram_intersect_list = allBigrams_set.intersection(lexicon_word_bigrams[lexicon_word])
                         for bigram in bigram_intersect_list:
@@ -661,7 +662,7 @@ def reading_simulation(filename): #, parameters):
                         for monogram in allMonograms:
                             if monogram in lexicon_word:
                                 wordExcitationInput+= pm.bigram_to_word_excitation * unitActivations[monogram]
-        
+
                         # # ## Slow bigram & monogram activations
                         # wordExcitationInput2 = 0
                         # #wordBigramsInhibitionInput = 0
@@ -677,9 +678,9 @@ def reading_simulation(filename): #, parameters):
                         #     if monogram in lexicon_word:
                         #         wordExcitationInput2+= pm.bigram_to_word_excitation * unitActivations[monogram]
                         #     #wordBigramsInhibitionInput += pm.bigram_to_word_inhibition * unitActivations[monogram]
-        
+
                         word_input_np[lexicon_ix] = wordExcitationInput + wordBigramsInhibitionInput
-        
+
                         if lexicon_word == individual_words[fixation] :
                             crt_fixation_word_activities_np[amount_of_cycles,0] = wordExcitationInput
                             crt_fixation_word_activities_np[amount_of_cycles,1] = abs(wordBigramsInhibitionInput)

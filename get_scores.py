@@ -100,8 +100,9 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
     exp_FD_dict = exp.get_saccade_durations()
 
     ## Get distance between curves in plot
-    total_distance = 0
-    distances = {}
+    sse = 0
+    total_divergence = 0
+    sses = {}
     divergences = {}
     simulation = [total_viewing_time["fixation duration"],
                   gaze_durations['fixation duration'],
@@ -124,6 +125,13 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
              "Second fixation duration",
              "Regression"
              ]
+
+#    with open("experiment.pkl","w") as f:
+#        pickle.dump(experiment,f)
+
+#    with open("simulation.pkl","w") as f:
+#        pickle.dump(simulation,f)
+
     plt.close()
     fig, ax = plt.subplots(2, 3, sharex='col', sharey='row')
     ax = ax.ravel()
@@ -133,43 +141,63 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
 
         min_ = min([exp_.min(), sim_.min()])
         max_ = max([exp_.max(), sim_.max()])
-
-        X = np.mgrid[min_:max_:500j]
-        positions = X.ravel()
-        values_x = sim_
-        values_y = exp_
-	print("-----------------Kernel x------------------")
-	print(values_x)
-	print("-----------------Kernel y------------------")
-	print(values_y)
-	# Workaround to make parametertuning possible in case there is no data because e.g. no regressions have been made
-	try:
-	        kernel_x = stats.gaussian_kde(values_x)
-        except:
-		print("Error: empty dataframe for "+name+"replacing x with inverse y")
-		kernel_x = stats.gaussian_kde(-values_y)
-	kernel_y = stats.gaussian_kde(values_y)
-        # Set bandwidth like in the original plotting method
-        band_width = 0.31
-        kernel_x.set_bandwidth(band_width)
-        kernel_y.set_bandwidth(band_width)
-        Z_x = np.reshape(kernel_x(positions).T, X.shape)
-        Z_y = np.reshape(kernel_y(positions).T, X.shape)
-        total_distance += sum(map(lambda x: abs(x[0]-x[1]), zip(Z_x,Z_y)))
-        distances[name] = sum(map(lambda x: abs(x[0]-x[1]), zip(Z_x,Z_y)))
-        divergences[name] = kl_divergence(Z_x,Z_y)
+        if pm.discretization == "bin":
+            resolution_ms = 25  # specify resolution of 25 ms
+            n_bins = max_/resolution_ms
+            bins = np.linspace(min_, max_, n_bins)  # bins for SSE
+            x_index = np.digitize(exp_, bins)
+            y_index = np.digitize(sim_, bins)
+            x = np.bincount(x_index)
+            y = np.bincount(y_index, minlength=len(x))
+        if pm.discretization == "kde":
+            X = np.mgrid[min_:max_+1:25]  # discretize data in 25ms steps (for kde)
+            positions = X.ravel()
+            values_x = sim_
+            values_y = exp_
+            print("-----------------values x------------------")
+            print(values_x)
+            print("-----------------values y------------------")
+            print(values_y)
+            # Workaround to make parametertuning possible in case there is no data because e.g. no regressions have been made
+            try:
+                kernel_x = stats.gaussian_kde(values_x)
+            except:
+                print("Error: empty dataframe for "+name+"replacing x with inverse y")
+                kernel_x = stats.gaussian_kde(-values_y)
+                kernel_y = stats.gaussian_kde(values_y)
+            # Set bandwidth like in the original plotting method
+            band_width = 0.31
+            kernel_x.set_bandwidth(band_width)
+            kernel_y.set_bandwidth(band_width)
+            x = np.reshape(kernel_x(positions).T, X.shape)
+            y = np.reshape(kernel_y(positions).T, X.shape)
+        sses[name] = sum(map(lambda x_: (x_[0]-x_[1])**2, zip(x,y)))
+        sse += sses[name]
+#        divergences[name] = kl_divergence(x,y)
+#        total_divergence += divergences[name]
         plot = True
 	t = time()
         if plot:
             #plt.subplot(2, 3, i)
-            ax[i].set_ylim(0,0.01)
-            line_x = ax[i].plot(Z_x)
-            line_y = ax[i].plot(Z_y)
-            ax[i].set_title(name+": \n"+str(round(distances[name],3))+" / "+str(round(divergences[name], 3)))
+#            ax[i].set_ylim(0,0.01)
+            line_x = ax[i].plot(x)
+            line_y = ax[i].plot(y)
+            ax[i].set_title(name+": \n"+str(round(sses[name],3))) #+" / "+str(round(divergences[name], 3)))
             # ax[x,y].suptitle("KDE for: "+name)
             i += 1
-    plt.figlegend(handles=[line_x, line_y], labels=["Simulation", "Experiment"], loc='upper-right')  # ["Simulation", "Experiment"])
-    fig.suptitle("Total distance: "+str(total_distance))
+    plt.figlegend(handles=[line_x, line_y], labels=["Simulation", "Experiment"], loc='upper-right')
+#    fig.title("Total distance: "+str(round(total_distance, 2))+"\nTotal divergence: "+str(round(total_divergence, 2)))
+#    suptitle = plt.suptitle("Total divergence: "+str(round(total_divergence, 4)), y=1.02)
+    suptitle = plt.suptitle("SSE: "+str(round(sse, 4)), y=1.02)
     fig.tight_layout()
-    plt.savefig("test_density"+str(int(t))+".png", dpi=300)
-    return total_distance
+    plt.savefig("test_density"+str(int(t))+".png", bbox_extra_artists=(suptitle, ), bbox_inches="tight", dpi=300)
+    if pm.tuning_measure == "KL":
+        if not any(pm.objective):
+            return total_divergence
+        else:
+            return divergences[pm.objective]
+    if pm.tuning_measure == "SSE":
+        if not any(pm.objective):
+            return sse
+        else:
+            return sses[pm.objective]

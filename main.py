@@ -3,6 +3,7 @@ from reading_simulation import reading_simulation
 from reading_simulation_BT import reading_simulation_BT
 from analyse_data_pandas import get_results
 from create_name import create_name_josh
+import multiprocessing as mp
 import pickle
 import cProfile
 import pstats
@@ -63,14 +64,14 @@ bounds = []
 #parameters.append(pm.saccErr_sigma_scaler)
 #bounds.append((0, 1))
 
+parameters.append(15)
+bounds.append((2, 16))
 #parameters.append(pm.mu)
-#parameters.append(20)
-#bounds.append((2, 21))
 #bounds.append((2, 10))
 
-#parameters.append(10)
+#parameters.append(0.1)
+#bounds.append((0.5, 4))
 #parameters.append(pm.sigma)
-#bounds.append((0.5, 11))
 #bounds.append((0.5, 4))
 
 #parameters.append(pm.distribution_param)
@@ -82,43 +83,50 @@ bounds = []
 #parameters.append(pm.wordpred_p)
 #bounds.append((1,15))
 
-OLD_DISTANCE = 999
+OLD_DISTANCE = np.inf
 
 def reading_function(parameters):
 	global OLD_DISTANCE
 	filename = "PSC_ALL"
 	filepath_psc = "PSC/" + filename + ".txt"
-	(lexicon,all_data, unrecognized_words) = reading_simulation(filepath_psc, parameters)
 ### For testing
 #	with open("Results/all_data.pkl","r") as f:
 #		all_data = pickle.load(f)
 #	with open("Results/unrecognized.pkl","r") as f:
 #		unrecognized_words = pickle.load(f)
 ###
-	distance = get_scores(filename,all_data,unrecognized_words)
+	(lexicon,all_data, unrecognized_words) = reading_simulation(filepath_psc, parameters)
+	first_distance = get_scores(filename,all_data,unrecognized_words)
+
+	(lexicon,all_data, unrecognized_words) = reading_simulation(filepath_psc, parameters)
+	second_distance = get_scores(filename,all_data,unrecognized_words)
+
+	distance = (first_distance + second_distance) / 2
+
 	if distance < OLD_DISTANCE:
 		np.savetxt(str(distance)+"_parameters.txt",parameters)
 		OLD_DISTANCE = distance
 
 	with open("dist.txt","a") as f:
-		f.write("Distance:"+str(distance)+"\n")
+		f.write(str(first_distance)+", "+str(second_distance)+": "+str(distance)+"\n")
 	return distance
 
-run_exp = False  # True
-analyze_results = True
-save_results = False  # True
-optimize = False
+
+run_exp = False
+analyze_results = False
+save_results = False
+optimize = True
 
 if pm.language == "german":
 	filename = "PSC_ALL"
 	filepath_psc = "PSC/" + filename + ".txt"
 if pm.language == "dutch":
 	filename = "PSC/words_dutch.pkl"
-output_file_all_data, output_file_unrecognized_words = ("Results/all_data.pkl","Results/unrecognized.pkl")
+output_file_all_data, output_file_unrecognized_words = ("Results/all_data"+pm.language+".pkl","Results/unrecognized"+pm.language+".pkl")
 start_time = time.time()
 
 if run_exp:
-	(lexicon,all_data, unrecognized_words) = reading_simulation(filepath_psc)
+	(lexicon,all_data, unrecognized_words) = reading_simulation(filepath_psc, parameters=False)
 	if save_results:
 		all_data_file = open(output_file_all_data,"w")
 		pickle.dump(all_data, all_data_file)
@@ -130,10 +138,11 @@ if run_exp:
 
 if analyze_results:
 	get_results(filename,output_file_all_data,output_file_unrecognized_words)
-#if optimize:
-#	results = scipy.optimize.fmin_l_bfgs_b(func=reading_function, x0=np.array(parameters), bounds=bounds, approx_grad=True , disp=True)
+if optimize:
+	epsilon = pm.epsilon
+	results = scipy.optimize.fmin_l_bfgs_b(func=reading_function, x0=np.array(parameters), bounds=bounds, approx_grad=True , disp=True, epsilon=epsilon)
+	with open("results_optimization.pkl","wb") as f:
+		pickle.dump(results, f)
+
 time_elapsed = time.time()-start_time
-#with open("results_optimization.pkl","wb") as file:
-#	pickle.dump(results, file)
 print("Time elapsed: "+str(time_elapsed))
-print("Total distance: "+str(distance))

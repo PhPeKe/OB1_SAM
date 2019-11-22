@@ -26,6 +26,10 @@ predbins = np.arange(0.1,1.2,0.5)
 def write_to_hdf_fixed(df):
     df.to_hdf('Data/Fixation_durations_complete.hdf','complete',mode='w')
 
+def write_to_pkl(df):
+    with open("Data/Fixation_durations_"+pm.language+".pkl","w") as f:
+        pickle.dump(df, f)
+
 def get_exp_data():
     convert_dict = {column:comma_to_dot for column in [0,1,2,3,4,5]}
     ## todo create own naming, consistent with model naming
@@ -40,16 +44,16 @@ def get_exp_data():
     for i,value in enumerate(saccade_data.loc[:,'haveFirstPass']):
         if value == 0 and (saccade_data.loc[i-1,'haveFirstPass'] == 1) and (saccade_data.loc[i+1,'haveFirstPass']== 1):
             saccade_data.loc[i,'one wordskip'] = True
-    write_to_hdf_fixed(saccade_data)
+    with open("Data/Fixation_durations_"+pm.language+".pkl","w") as f:
+        pickle.dump(saccade_data, f)
+    write_to_pkl(saccade_data)
     return saccade_data
 
 def read_exp_data():
-    if pm.language == "german":
-        filename = 'Data/Fixation_durations_complete.hdf'
-    if pm.language == "dutch":
-        filename = 'Data/Fixation_durations_dutch.hdf'
+    filename = "Data/Fixation_durations_"+pm.language+".pkl"
     if os.path.isfile(filename):
-        return pd.read_hdf(filename, 'complete')
+        with open(filename,"r") as f:
+            return pkl.load(f)
     else:
         return get_exp_data()
 

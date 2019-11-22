@@ -29,27 +29,27 @@ if pm.visualise:
 def reading_simulation(filename, parameters):
 
     if any(parameters):
-    #    pm.decay = parameters[0]
-    #    pm.bigram_to_word_excitation = parameters[1]
-    #    pm.bigram_to_word_inhibition = parameters[2]
-    #    pm.word_inhibition = parameters[3]
-    #    pm.max_activity = parameters[4]
-    #    pm.max_attend_width = int(parameters[5])
-    #    pm.min_attend_width = int(parameters[6])
-    #    pm.attention_skew = parameters[7]
-    #    pm.bigram_gap = int(parameters[8])
-    #    pm.min_overlap = int(parameters[9])
-    #    pm.refix_size = parameters[10]
-    #    pm.salience_position = parameters[11]
-    #    pm.sacc_optimal_distance = parameters[12]
-    #    pm.saccErr_scaler = parameters[13]
-    #    pm.saccErr_sigma = abs(parameters[14])
-    #    pm.saccErr_sigma_scaler = parameters[15]
-        pm.mu = parameters[0]
-    #    pm.sigma = parameters[1]
-    #    pm.distribution_param = parameters[18]
-    #    pm.wordfreq_p = parameters[19]
-    #    pm.wordpred_p = parameters[20]
+#        pm.decay = parameters[0]
+#        pm.bigram_to_word_excitation = parameters[1]
+#        pm.bigram_to_word_inhibition = parameters[2]
+#        pm.word_inhibition = parameters[3]
+#        pm.max_activity = parameters[4]
+#        pm.max_attend_width = int(parameters[5])
+#        pm.min_attend_width = int(parameters[6])
+#        pm.attention_skew = parameters[7]
+#        pm.bigram_gap = int(parameters[8])
+#        pm.min_overlap = int(parameters[9])
+#        pm.refix_size = parameters[10]
+#        pm.salience_position = parameters[11]
+#        pm.sacc_optimal_distance = parameters[12]
+#        pm.saccErr_scaler = parameters[13]
+        pm.saccErr_sigma = abs(parameters[0])
+        pm.saccErr_sigma_scaler = parameters[1]
+        pm.mu = parameters[2]
+        pm.sigma = parameters[3]
+#        pm.distribution_param = parameters[18]
+#        pm.wordfreq_p = parameters[19]
+#        pm.wordpred_p = parameters[20]
 
 
     lexicon = []

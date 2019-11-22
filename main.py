@@ -12,82 +12,107 @@ import time
 import numpy as np
 from get_scores import get_scores
 import parameters as pm
+import pandas as pd
 
 parameters = []
 bounds = []
+names = []
 
 #parameters.append(pm.decay)
 #bounds.append((-0.95,-0.01))
+#names.append("decay")
 
 #parameters.append(pm.bigram_to_word_excitation)
 #bounds.append((0, None))
+#names.append("bigram_to_word_excitation")
 
 #parameters.append(pm.bigram_to_word_inhibition)
 #bounds.append((None, 0))
+#names.append("bigram_to_word_inhibition")
 
 #parameters.append(pm.word_inhibition)
 #bounds.append((None, 0))
+#names.append("word_inhibition")
 
 #parameters.append(pm.max_activity)
 #bounds.append((0, 5))
+#names.append("max_activity")
 
 #parameters.append(pm.max_attend_width)
 #bounds.append((3, 9))
+#names.append("max_attend_width")
 
 #parameters.append(pm.min_attend_width)
 #bounds.append((1,3))
+#names.append("min_attend_width")
 
 #parameters.append(pm.attention_skew)
 #bounds.append((1, 8))
+#names.append("attention_skew")
 
 #parameters.append(pm.bigram_gap)
 #bounds.append((2, 10))
+#names.append("bigram_gap")
 
 #parameters.append(pm.min_overlap)
 #bounds.append((1, 10))
+#names.append("min_overlap")
 
 #parameters.append(pm.refix_size)
 #bounds.append((0, 2))
+#names.append("refix_size")
 
 #parameters.append(pm.salience_position)
 #bounds.append((0, 5))
+#names.append("salience_position")
 
 #parameters.append(pm.sacc_optimal_distance)
 #bounds.append((3, 10))
+#names.append("sacc_optimal_distance")
 
 #parameters.append(pm.saccErr_scaler)
 #bounds.append((0, 3))
+#names.append("sacc_err_scaler")
 
-#parameters.append(pm.saccErr_sigma)
-#bounds.append((0, 1))
+parameters.append(pm.saccErr_sigma)
+bounds.append((0, 1))
+names.append("sacc_err_sigma")
 
-#parameters.append(pm.saccErr_sigma_scaler)
-#bounds.append((0, 1))
+parameters.append(pm.saccErr_sigma_scaler)
+bounds.append((0, 1))
+names.append("sacc_err_sigma_scaler")
 
-parameters.append(15)
-bounds.append((2, 16))
 #parameters.append(pm.mu)
-#bounds.append((2, 10))
+#bounds.append((2, 16))
+names.append("mu")
+parameters.append(pm.mu)
+bounds.append((2, 10))
 
-#parameters.append(0.1)
-#bounds.append((0.5, 4))
+parameters.append(pm.sigma)
+bounds.append((0.5, 4))
+names.append("sigma")
 #parameters.append(pm.sigma)
 #bounds.append((0.5, 4))
 
 #parameters.append(pm.distribution_param)
 #bounds.append((0.5, 5))
+#names.append("distribution_param")
 
 #parameters.append(pm.wordfreq_p)
 #bounds.append((1,15))
+#names.append("wordfreq_p")
 
 #parameters.append(pm.wordpred_p)
 #bounds.append((1,15))
+#names.append("wordpred_p")
 
 OLD_DISTANCE = np.inf
+N_RUNS = 0
 
 def reading_function(parameters):
 	global OLD_DISTANCE
-	filename = "PSC_ALL"
+	global N_RUNS
+	filename = "PSC"
 	filepath_psc = "PSC/" + filename + ".txt"
 ### For testing
 #	with open("Results/all_data.pkl","r") as f:
@@ -96,19 +121,17 @@ def reading_function(parameters):
 #		unrecognized_words = pickle.load(f)
 ###
 	(lexicon,all_data, unrecognized_words) = reading_simulation(filepath_psc, parameters)
-	first_distance = get_scores(filename,all_data,unrecognized_words)
+	distance = get_scores(filename,all_data,unrecognized_words)
 
-	(lexicon,all_data, unrecognized_words) = reading_simulation(filepath_psc, parameters)
-	second_distance = get_scores(filename,all_data,unrecognized_words)
-
-	distance = (first_distance + second_distance) / 2
+	write_out = pd.DataFrame(np.array([names,parameters]).T)
 
 	if distance < OLD_DISTANCE:
-		np.savetxt(str(distance)+"_parameters.txt",parameters)
+		write_out.to_csv(str(distance)+"_"+pm.tuning_measure+"parameters.txt", index=False, header=["name","value"])
 		OLD_DISTANCE = distance
 
 	with open("dist.txt","a") as f:
-		f.write(str(first_distance)+", "+str(second_distance)+": "+str(distance)+"\n")
+		f.write("run "+str(N_RUNS)+": "+str(distance)+"\n")
+	N_RUNS += 1
 	return distance
 
 

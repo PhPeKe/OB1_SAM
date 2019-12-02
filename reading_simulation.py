@@ -20,6 +20,7 @@ import pickle
 import parameters as pm
 import sys
 import io
+import os
 if pm.visualise:
     import Visualise_reading
 
@@ -83,6 +84,14 @@ def reading_simulation(filename, parameters):
     # load dicts for threshold
     if pm.language == "german":
         word_freq_dict, word_pred_values = get_freq_pred_files()
+        # Replace prediction values with syntactic probabilities
+        if pm.use_grammar_prob:
+            print("HERE!!")
+            print(os.listdir("Data"))
+            sys.path.append("Data")
+            with open("Data/PSCALLsyntax_probabilites.pkl","r") as f:
+                word_pred_values = pickle.load(f)
+
     if pm.language == "dutch":
         word_freq_dict = pickle.load(open("Data/nederlands/freq.pkl"))
         word_pred_values = np.ones(len(textsplitbyspace))
@@ -90,6 +99,7 @@ def reading_simulation(filename, parameters):
 #    pickle.dump([word_freq_dict,word_pred_values],open("Data/freq_pred.pkl", "w"))
     max_frequency_key = max(word_freq_dict, key=word_freq_dict.get)
     max_frequency = word_freq_dict[max_frequency_key]
+    print("Length text: "+str(len(individual_words))+"\nLength pred: "+str(len(word_pred_values)))
     word_pred_values = word_pred_values[0:len(individual_words)]
     max_predictability = np.max(word_pred_values)
     min_predictability = np.min(word_pred_values)
@@ -485,13 +495,13 @@ def reading_simulation(filename, parameters):
 		print("woops")
 	my_print("stimulus: ",stimulus)
         #print 'EyePostition:',EyePosition
-        
+
         amount_of_cycles = 0
         amount_of_cycles_since_attention_shifted = 0
 
         shift = False
         AttentionPosition = EyePosition
-        
+
         #this is the position of the first letter that is at the right of the middle of the fixation word
         fixationFirstPositionRightToMiddle = None
         fixationFirstPositionLeftToMiddle = None

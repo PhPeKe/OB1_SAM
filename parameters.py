@@ -13,14 +13,15 @@ print "Parameters Initialised"
 
 # Control-flow parameters
 language = "german"  # german, dutch
+use_grammar_prob = True
 tuning_measure = "SSE"  # can be "KL" or "SSE"
 discretization = "bin"  # can be "bin" or "kde"
-objective = []  # empty list for total SSE/KL, for single objectives: "total viewing time",
+objective = "Single fixations"  # empty list for total SSE/KL, for single objectives: "total viewing time",
                 # "Gaze durations", "Single fixations", "First fixation duration",
                 # "Second fixation duration", "Regression"
 output_dir = time.time()
 epsilon = 0.1  # Step-size for approximation of the gradient
-n_iter = 4  # Number of instances running in p√parallel to middle the distance
+n_iter = 4  # Number of instances running in p√parallel to middle the distance (not implemented yet)
 
 print("reading in " + language)
 

@@ -12,6 +12,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pdb
 import parameters as pm
+import sys
 
 ## lambda functions for converter
 comma_to_dot = lambda s: float(s.replace(",","."))
@@ -53,7 +54,7 @@ def read_exp_data():
     filename = "Data/Fixation_durations_"+pm.language+".pkl"
     if os.path.isfile(filename):
         with open(filename,"r") as f:
-            return pkl.load(f)
+            return pickle.load(f)
     else:
         return get_exp_data()
 
@@ -359,6 +360,17 @@ def get_freq_and_pred():
     convert_dict = {0:decode_ISO,1:comma_to_dot, 2:comma_to_dot}
     # Changed this, old code threw an decode error
     my_data = pd.read_csv("Texts/PSCall_freq_pred.txt",delimiter="\t")
+#    my_data = np.genfromtxt("Texts/PSCall_freq_pred.txt", names =True,encoding="latin-1",  dtype=['U2','f4','f4'], converters = convert_dict, skip_header=0, delimiter="\t")
+    predictions_dict = {}
+    return my_data
+
+def get_freq_and_syntax_pred():
+    convert_dict = {0:decode_ISO,1:comma_to_dot, 2:comma_to_dot}
+    # Changed this, old code threw an decode error
+    my_data = pd.read_csv("Texts/PSCall_freq_pred.txt",delimiter="\t")
+    sys.path.append("Data")
+    with open("Data/PSCALLsyntax_probabilites.pkl", "r") as f:
+        my_data["pred"] = pickle.load(f)
 #    my_data = np.genfromtxt("Texts/PSCall_freq_pred.txt", names =True,encoding="latin-1",  dtype=['U2','f4','f4'], converters = convert_dict, skip_header=0, delimiter="\t")
     predictions_dict = {}
     return my_data

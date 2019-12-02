@@ -112,7 +112,7 @@ N_RUNS = 0
 def reading_function(parameters):
 	global OLD_DISTANCE
 	global N_RUNS
-	filename = "PSC"
+	filename = "PSC_ALL"
 	filepath_psc = "PSC/" + filename + ".txt"
 ### For testing
 #	with open("Results/all_data.pkl","r") as f:

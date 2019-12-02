@@ -38,8 +38,10 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
             individual_words.append(word.strip())
     df_individual_words = pd.DataFrame(individual_words)
 
-    df_freq_pred = exp.get_freq_and_pred()
-
+    if pm.use_grammar_prob:
+        df_freq_pred = exp.get_freq_and_syntax_pred()
+    else:
+        df_freq_pred = exp.get_freq_and_pred()
 
     df_freq_pred = df_freq_pred.iloc[0:len(df_individual_words),:]
     df_individual_words = pd.concat([df_individual_words,df_freq_pred],axis=1,join_axes=[df_individual_words.index])
@@ -90,13 +92,6 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
 
     df_single_fixation = df_single_fixation.set_index('foveal word text index')
 
-    ## General fixation duration measures
-    total_viewing_time = df_alldata.groupby(['foveal word text index'])[['fixation duration']].sum()
-    gaze_durations = df_alldata_no_regr[['fixation duration', 'foveal word text index']].groupby(
-        ['foveal word text index']).sum()
-    df_FD_only_regr = df_alldata[(df_alldata['regressed'] == True)]['fixation duration']
-    df_single_fixations, first_fixation, second_fixation = trans.make_number_fixations(df_alldata_no_regr)
-    ## Fixation durations histograms
     exp_FD_dict = exp.get_saccade_durations()
 
     ## Get distance between curves in plot
@@ -106,7 +101,7 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
     divergences = {}
     simulation = [total_viewing_time["fixation duration"],
                   gaze_durations['fixation duration'],
-                  df_single_fixations['fixation duration'],
+                  df_single_fixation['fixation duration'],
                   first_fixation,
                   second_fixation,
                   df_FD_only_regr
@@ -126,11 +121,11 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
              "Regression"
              ]
 
-#    with open("experiment.pkl","w") as f:
-#        pickle.dump(experiment,f)
+    with open("experiment.pkl","w") as f:
+        pickle.dump(experiment,f)
 
-#    with open("simulation.pkl","w") as f:
-#        pickle.dump(simulation,f)
+    with open("simulation.pkl","w") as f:
+        pickle.dump(simulation,f)
 
     plt.close()
     fig, ax = plt.subplots(2, 3, sharex='col', sharey='row')

@@ -63,7 +63,10 @@ def get_results(input_text_filename,input_file_all_data,input_file_unrecognized_
                 df_individual_words = pd.DataFrame(individual_words)
 
                 if pm.language == "german":
-                    df_freq_pred = exp.get_freq_and_pred() ##Throws an error
+                    df_freq_pred = exp.get_freq_and_pred()
+                    if pm.use_grammar_prob:
+                        df_freq_pred = exp.get_freq_and_syntax_pred()
+
                 if pm.language == "dutch":
                     df_freq_pred = pickle.load(open("Data/nederlands/freq500_2.pkl","r"))  # TODO 
                     df_freq_pred = pd.DataFrame.from_dict(df_freq_pred, orient="index", columns=["freq"])
@@ -226,5 +229,5 @@ def get_results(input_text_filename,input_file_all_data,input_file_unrecognized_
             exp_FD_dict = exp.get_saccade_durations()
             mod.plot_FD_hists(total_viewing_time,gaze_durations,df_single_fixation,first_fixation,second_fixation,df_FD_only_regr,exp_FD_dict)
 
-
-            plt.show()
+            # Trying to reformat to save plots and not show them
+#            plt.show()

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # CHANGED
 from reading_simulation import reading_simulation
 from reading_simulation_BT import reading_simulation_BT
@@ -114,7 +115,7 @@ def reading_function(parameters):
 	global N_RUNS
 	filename = "PSC_ALL"
 	filepath_psc = "PSC/" + filename + ".txt"
-### For testing
+### For testing (loading past results instead of running simulation)
 #	with open("Results/all_data.pkl","r") as f:
 #		all_data = pickle.load(f)
 #	with open("Results/unrecognized.pkl","r") as f:
@@ -135,10 +136,10 @@ def reading_function(parameters):
 	return distance
 
 
-run_exp = False
-analyze_results = False
-save_results = False
-optimize = True
+run_exp = True
+analyze_results = True
+save_results = True
+optimize = False
 
 if pm.language == "german":
 	filename = "PSC_ALL"
@@ -149,7 +150,7 @@ output_file_all_data, output_file_unrecognized_words = ("Results/all_data"+pm.la
 start_time = time.time()
 
 if run_exp:
-	(lexicon,all_data, unrecognized_words) = reading_simulation(filepath_psc, parameters=False)
+	(lexicon,all_data, unrecognized_words) = reading_simulation(filepath_psc, parameters=[])
 	if save_results:
 		all_data_file = open(output_file_all_data,"w")
 		pickle.dump(all_data, all_data_file)
@@ -160,7 +161,7 @@ if run_exp:
 		unrecognized_file.close()
 
 if analyze_results:
-	get_results(filename,output_file_all_data,output_file_unrecognized_words)
+	get_results(filepath_psc,output_file_all_data,output_file_unrecognized_words)
 if optimize:
 	epsilon = pm.epsilon
 	results = scipy.optimize.fmin_l_bfgs_b(func=reading_function, x0=np.array(parameters), bounds=bounds, approx_grad=True , disp=True, epsilon=epsilon)

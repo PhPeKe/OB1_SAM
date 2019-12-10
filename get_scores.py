@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 __author__ = 'Phillip Kersten, adapted from Sam van Leipsig'
 
 import matplotlib
@@ -13,6 +14,7 @@ from reading_common import get_stimulus_text_from_file
 import read_saccade_data as exp
 import analyse_data_transformation as trans
 import parameters as pm
+import matplotlib.lines as mlines
 
 def kl_divergence(p, q):
     return np.sum(np.where(p != 0, p * np.log(p / q), 0))
@@ -168,21 +170,20 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
             y = np.reshape(kernel_y(positions).T, X.shape)
         sses[name] = sum(map(lambda x_: (x_[0]-x_[1])**2, zip(x,y)))
         sse += sses[name]
-#        divergences[name] = kl_divergence(x,y)
-#        total_divergence += divergences[name]
+        # KL divergence only possible with kernel density estimation
+        if pm.discretization == "kde":
+            divergences[name] = kl_divergence(x,y)
+            total_divergence += divergences[name]
         plot = True
 	t = time()
         if plot:
-            #plt.subplot(2, 3, i)
-#            ax[i].set_ylim(0,0.01)
-            line_x = ax[i].plot(x)
-            line_y = ax[i].plot(y)
-            ax[i].set_title(name+": \n"+str(round(sses[name],3))) #+" / "+str(round(divergences[name], 3)))
-            # ax[x,y].suptitle("KDE for: "+name)
+            line_x = ax[i].plot(x,"b")  # Experiment
+            line_y = ax[i].plot(y,"r")  # Simulation
+            ax[i].set_title(name+": \n"+str(round(sses[name],3)))
             i += 1
-    plt.figlegend(handles=[line_x, line_y], labels=["Simulation", "Experiment"], loc='upper-right')
-#    fig.title("Total distance: "+str(round(total_distance, 2))+"\nTotal divergence: "+str(round(total_divergence, 2)))
-#    suptitle = plt.suptitle("Total divergence: "+str(round(total_divergence, 4)), y=1.02)
+    blue_line = mlines.Line2D([],[], color="blue")
+    red_line = mlines.Line2D([],[], color="red")
+    plt.figlegend(handles=[red_line, blue_line], labels=["Simulation", "Experiment"], loc='upper right')
     suptitle = plt.suptitle("SSE: "+str(round(sse, 4)), y=1.02)
     fig.tight_layout()
     plt.savefig("test_density"+str(int(t))+".png", bbox_extra_artists=(suptitle, ), bbox_inches="tight", dpi=300)

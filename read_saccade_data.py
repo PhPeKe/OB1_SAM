@@ -369,6 +369,7 @@ def get_freq_and_syntax_pred():
     # Changed this, old code threw an decode error
     my_data = pd.read_csv("Texts/PSCall_freq_pred.txt",delimiter="\t")
     sys.path.append("Data")
+    print("Using syntax pred values")
     with open("Data/PSCALLsyntax_probabilites.pkl", "r") as f:
         my_data["pred"] = pickle.load(f)
 #    my_data = np.genfromtxt("Texts/PSCall_freq_pred.txt", names =True,encoding="latin-1",  dtype=['U2','f4','f4'], converters = convert_dict, skip_header=0, delimiter="\t")

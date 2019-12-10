@@ -3,16 +3,15 @@
 import time
 
 __author__ = 'Sam van Leipsig'
-print "Parameters Initialised"
-## Word activation
-## Monoweight = 2
-# decay = -0.047
-# bigram_to_word_excitation = 0.004
-# bigram_to_word_inhibition = -0.0001
-# word_inhibition = -0.0014
+print("Parameters Initialised")
+
 # Control-flow parameters
+run_exp = True  # Should the reading simulation run?
+analyze_results = True  # Should the results be analyzed?
+optimize = False  # Should the parameters be optimized?
+
 language = "german"  # german, dutch
-use_grammar_prob = True
+use_grammar_prob = True  # True for using grammar probabilities, False for using cloze
 tuning_measure = "SSE"  # can be "KL" or "SSE"
 discretization = "bin"  # can be "bin" or "kde"
 objective = []  # empty list for total SSE/KL, for single objectives: "total viewing time",
@@ -26,12 +25,15 @@ print("_----PARAMETERS----_")
 print("reading in " + language)
 if use_grammar_prob:
     print("Using syntax probabilities")
-print("Using: "+tuning_measure)
-if any(objective):
-    print("Single Objective: "+tuning_measure+" of "+objective)
 else:
-    print("Using total "+tuning_measure)
-print("Step-size: "+str(epsilon))
+    print("Using cloze probabilities")
+if optimize:
+    print("Using: "+tuning_measure)
+    if any(objective):
+        print("Single Objective: "+tuning_measure+" of "+objective)
+    else:
+        print("Using total "+tuning_measure)
+    print("Step-size: "+str(epsilon))
 print("-------------------")
 
 ## Monoweight = 1
@@ -96,3 +98,10 @@ wordlen_nonlin = -0.4
 # start_nonlin = 0.143
 # nonlin_scaler = 0.21
 # wordlen_nonlin = -0.8
+
+## Word activation
+## Monoweight = 2
+# decay = -0.047
+# bigram_to_word_excitation = 0.004
+# bigram_to_word_inhibition = -0.0001
+# word_inhibition = -0.0014

@@ -10,20 +10,29 @@ print "Parameters Initialised"
 # bigram_to_word_excitation = 0.004
 # bigram_to_word_inhibition = -0.0001
 # word_inhibition = -0.0014
-
 # Control-flow parameters
 language = "german"  # german, dutch
 use_grammar_prob = True
 tuning_measure = "SSE"  # can be "KL" or "SSE"
 discretization = "bin"  # can be "bin" or "kde"
-objective = "Single fixations"  # empty list for total SSE/KL, for single objectives: "total viewing time",
+objective = []  # empty list for total SSE/KL, for single objectives: "total viewing time",
                 # "Gaze durations", "Single fixations", "First fixation duration",
                 # "Second fixation duration", "Regression"
 output_dir = time.time()
 epsilon = 0.1  # Step-size for approximation of the gradient
-n_iter = 4  # Number of instances running in p√parallel to middle the distance (not implemented yet)
 
+
+print("_----PARAMETERS----_")
 print("reading in " + language)
+if use_grammar_prob:
+    print("Using syntax probabilities")
+print("Using: "+tuning_measure)
+if any(objective):
+    print("Single Objective: "+tuning_measure+" of "+objective)
+else:
+    print("Using total "+tuning_measure)
+print("Step-size: "+str(epsilon))
+print("-------------------")
 
 ## Monoweight = 1
 decay = -0.05

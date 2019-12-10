@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Author: J.J. Snell & S.G. van Leipsig
 # supervised by dr. M. Meeter
 # 01-07-15
@@ -86,8 +87,6 @@ def reading_simulation(filename, parameters):
         word_freq_dict, word_pred_values = get_freq_pred_files()
         # Replace prediction values with syntactic probabilities
         if pm.use_grammar_prob:
-            print("HERE!!")
-            print(os.listdir("Data"))
             sys.path.append("Data")
             with open("Data/PSCALLsyntax_probabilites.pkl","r") as f:
                 word_pred_values = pickle.load(f)
@@ -1036,6 +1035,7 @@ def reading_simulation(filename, parameters):
 
         if fixation == TOTAL_WORDS-1:  # Check if end of text is reached.
             end_of_text = True
+            print("END REACHED!")
             continue
 
         my_print(regression,refixation,forward,wordskip)

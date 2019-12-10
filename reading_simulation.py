@@ -81,6 +81,7 @@ def reading_simulation(filename, parameters):
 #        target_positions[i] = int(target_positions[i].replace('\n',''))
 #    print target_positions
 
+<<<<<<< HEAD
 
     # load dicts for threshold
     if pm.language == "german":

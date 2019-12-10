@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 Word number 59714: En
+=======
+Word number 727: fleisch
+>>>>>>> 07a3a570b16450287190bc801c69102e3c0c5c4b

@@ -62,6 +62,7 @@ def get_results(input_text_filename,input_file_all_data,input_file_unrecognized_
                         individual_words.append(word.strip())
                 df_individual_words = pd.DataFrame(individual_words)
 
+<<<<<<< HEAD
                 if pm.language == "german":
                     df_freq_pred = exp.get_freq_and_pred()
                     if pm.use_grammar_prob:
@@ -74,6 +75,15 @@ def get_results(input_text_filename,input_file_all_data,input_file_unrecognized_
                     df_freq_pred["pred"][:] = 0.1
                     df_freq_pred["word"] = df_freq_pred.index
                     df_freq_pred.index = range(0,len(df_freq_pred))
+=======
+                #df_freq_pred = pickle.load(open("Data/nederlands/freq500_2.pkl","r"))  # TODO 
+                df_freq_pred = exp.get_freq_and_pred() ##Throws an error
+                #df_freq_pred = pd.DataFrame.from_dict(df_freq_pred, orient="index", columns=["freq"])
+                #df_freq_pred["pred"] = np.zeros(len(df_freq_pred))
+                #df_freq_pred["pred"][:] = 0.1
+                #df_freq_pred["word"] = df_freq_pred.index
+                #df_freq_pred.index = range(0,len(df_freq_pred))
+>>>>>>> 07a3a570b16450287190bc801c69102e3c0c5c4b
                 #print(df_freq_pred)
                 # TODO fix
                 #import copy_reg
@@ -229,5 +239,10 @@ def get_results(input_text_filename,input_file_all_data,input_file_unrecognized_
             exp_FD_dict = exp.get_saccade_durations()
             mod.plot_FD_hists(total_viewing_time,gaze_durations,df_single_fixation,first_fixation,second_fixation,df_FD_only_regr,exp_FD_dict)
 
+<<<<<<< HEAD
             # Trying to reformat to save plots and not show them
 #            plt.show()
+=======
+
+            plt.show()
+>>>>>>> 07a3a570b16450287190bc801c69102e3c0c5c4b

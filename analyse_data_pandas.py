@@ -62,7 +62,6 @@ def get_results(input_text_filename,input_file_all_data,input_file_unrecognized_
                         individual_words.append(word.strip())
                 df_individual_words = pd.DataFrame(individual_words)
 
-
                 if pm.language == "german":
                     df_freq_pred = exp.get_freq_and_pred()
                     if pm.use_grammar_prob:
@@ -75,6 +74,7 @@ def get_results(input_text_filename,input_file_all_data,input_file_unrecognized_
                     df_freq_pred["pred"][:] = 0.1
                     df_freq_pred["word"] = df_freq_pred.index
                     df_freq_pred.index = range(0,len(df_freq_pred))
+
                 #print(df_freq_pred)
                 # TODO fix
                 #import copy_reg
@@ -229,6 +229,3 @@ def get_results(input_text_filename,input_file_all_data,input_file_unrecognized_
             ## Fixation durations histograms
             exp_FD_dict = exp.get_saccade_durations()
             mod.plot_FD_hists(total_viewing_time,gaze_durations,df_single_fixation,first_fixation,second_fixation,df_FD_only_regr,exp_FD_dict)
-
-            # Trying to reformat to save plots and not show them
-#            plt.show()

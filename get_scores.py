@@ -3,6 +3,7 @@ __author__ = 'Phillip Kersten, adapted from Sam van Leipsig'
 
 import matplotlib
 from time import time
+import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
@@ -62,6 +63,7 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
 
     ## Word measures by cycle, grouped by word length
     # not necessary??  # word_measures_bylen_dict = trans.make_word_measures_bylength(df_alldata)
+
     df_alldata = df_alldata.drop(['fixation word activities np'],1)
     df_alldata_no_regr['foveal word text index2'] = df_alldata_no_regr['foveal word text index']
     df_SF = df_alldata_no_regr.groupby(['foveal word text index']).filter(lambda x: len(x)==1)
@@ -168,21 +170,21 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
             kernel_y.set_bandwidth(band_width)
             x = np.reshape(kernel_x(positions).T, X.shape)
             y = np.reshape(kernel_y(positions).T, X.shape)
-        sses[name] = sum(map(lambda x_: (x_[0]-x_[1])**2, zip(x,y)))
+        sses[name] = sum(map(lambda x_: (x_[0]-x_[1])**2, zip(x, y)))
         sse += sses[name]
         # KL divergence only possible with kernel density estimation
         if pm.discretization == "kde":
             divergences[name] = kl_divergence(x,y)
             total_divergence += divergences[name]
         plot = True
-	t = time()
+        t = time()
         if plot:
-            line_x = ax[i].plot(x,"b")  # Experiment
-            line_y = ax[i].plot(y,"r")  # Simulation
-            ax[i].set_title(name+": \n"+str(round(sses[name],3)))
+            ax[i].plot(x, "b")  # Experiment
+            ax[i].plot(y, "r")  # Simulation
+            ax[i].set_title(name+": \n"+str(round(sses[name], 3)))
             i += 1
-    blue_line = mlines.Line2D([],[], color="blue")
-    red_line = mlines.Line2D([],[], color="red")
+    blue_line = mlines.Line2D([], [], color="blue")
+    red_line = mlines.Line2D([], [], color="red")
     plt.figlegend(handles=[red_line, blue_line], labels=["Simulation", "Experiment"], loc='upper right')
     suptitle = plt.suptitle("SSE: "+str(round(sse, 4)), y=1.02)
     fig.tight_layout()

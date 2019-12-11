@@ -361,6 +361,7 @@ def get_freq_and_pred():
     # Changed this, old code threw an decode error
     my_data = pd.read_csv("Texts/PSCall_freq_pred.txt",delimiter="\t")
 #    my_data = np.genfromtxt("Texts/PSCall_freq_pred.txt", names =True,encoding="latin-1",  dtype=['U2','f4','f4'], converters = convert_dict, skip_header=0, delimiter="\t")
+
     predictions_dict = {}
     return my_data
 

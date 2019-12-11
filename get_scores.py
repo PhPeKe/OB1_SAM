@@ -63,7 +63,6 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
 
     ## Word measures by cycle, grouped by word length
     # not necessary??  # word_measures_bylen_dict = trans.make_word_measures_bylength(df_alldata)
-
     df_alldata = df_alldata.drop(['fixation word activities np'],1)
     df_alldata_no_regr['foveal word text index2'] = df_alldata_no_regr['foveal word text index']
     df_SF = df_alldata_no_regr.groupby(['foveal word text index']).filter(lambda x: len(x)==1)

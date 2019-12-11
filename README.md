@@ -1,4 +1,5 @@
 # OB1_SAM
+<<<<<<< HEAD
 OB1 is a reading-model that simulates the processes behind reading in the brain. 
 
 For more information about the theoretical aspects of OB1 and a validation of its reading capabilities see: https://www.ncbi.nlm.nih.gov/pubmed/30080066
@@ -25,3 +26,6 @@ In order to run a "normal" experiment one should set "run_exp" and "analyze_resu
 **Parameter-tuning**
 
 For parameter-tuning set the parameters you wish to change in "get_parameters.py" and then 
+=======
+OB1 is a reading-model that simulates the processes behind reading in the brain. For more information about the theoretical aspects of OB1 and a validation of its reading capabilities see: https://www.ncbi.nlm.nih.gov/pubmed/30080066
+>>>>>>> 366da55f5cfa61da70abce8d5d62b06f19202bbc

@@ -12,6 +12,7 @@ optimize = False  # Should the parameters be optimized?
 
 language = "german"  # german, dutch
 use_grammar_prob = True  # True for using grammar probabilities, False for using cloze
+
 tuning_measure = "SSE"  # can be "KL" or "SSE"
 discretization = "bin"  # can be "bin" or "kde"
 objective = []  # empty list for total SSE/KL, for single objectives: "total viewing time",
@@ -34,6 +35,7 @@ if optimize:
     else:
         print("Using total "+tuning_measure)
     print("Step-size: "+str(epsilon))
+
 print("-------------------")
 
 ## Monoweight = 1

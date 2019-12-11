@@ -1,14 +1,38 @@
 # CHANGED
+# -*- coding: UTF-8 -*-
+import time
 
 __author__ = 'Sam van Leipsig'
 print "Parameters Initialised"
-
 ## Word activation
 ## Monoweight = 2
 # decay = -0.047
 # bigram_to_word_excitation = 0.004
 # bigram_to_word_inhibition = -0.0001
 # word_inhibition = -0.0014
+# Control-flow parameters
+language = "german"  # german, dutch
+use_grammar_prob = True
+tuning_measure = "SSE"  # can be "KL" or "SSE"
+discretization = "bin"  # can be "bin" or "kde"
+objective = []  # empty list for total SSE/KL, for single objectives: "total viewing time",
+                # "Gaze durations", "Single fixations", "First fixation duration",
+                # "Second fixation duration", "Regression"
+output_dir = time.time()
+epsilon = 0.1  # Step-size for approximation of the gradient
+
+
+print("_----PARAMETERS----_")
+print("reading in " + language)
+if use_grammar_prob:
+    print("Using syntax probabilities")
+print("Using: "+tuning_measure)
+if any(objective):
+    print("Single Objective: "+tuning_measure+" of "+objective)
+else:
+    print("Using total "+tuning_measure)
+print("Step-size: "+str(epsilon))
+print("-------------------")
 
 ## Monoweight = 1
 decay = -0.05
@@ -23,11 +47,11 @@ max_activity = 1.3
 ## Attentional width
 max_attend_width = 5.0
 min_attend_width = 3.0
-attention_skew = 4 # 1 equals symmetrical distribution
+attention_skew = 2.39  #4 # 1 equals symmetrical distribution
 bigram_gap = 6
 min_overlap = 2
 refix_size = 0.2
-salience_position = 1.29
+salience_position = 5  #1.29
 corpora_repeats = 0
 
 
@@ -50,12 +74,12 @@ saccErr_sigma = 0.17 # basic sigma
 saccErr_sigma_scaler = 0.06 # effect of distance on sigma
 
 ## Fixation duration# s
-mu, sigma = 4.9, 2.2
+mu, sigma = 5.46258, 4  # 4.9, 2.2
 distribution_param = 1.1
 
 ## Threshold parameters
 linear = False
-wordfreq_p = 9
+wordfreq_p = 15  # 9
 wordpred_p = 5.5
 
 #linear

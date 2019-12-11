@@ -8,14 +8,16 @@ import pandas as pd
 from pandas import HDFStore
 import os.path
 import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pdb
 import parameters as pm
+import sys
 
 ## lambda functions for converter
 comma_to_dot = lambda s: float(s.replace(",","."))
 remove_dot = lambda s: s.replace(".","")
-decode_ISO= lambda x: x.decode('ISO-8859-1', errors="strict")
+decode_ISO= lambda x: x.decode('ISO-8859-1', errors="strict").encode("utf-8")
 
 
 freqbins  = np.arange(0,7,1)
@@ -24,6 +26,10 @@ predbins = np.arange(0.1,1.2,0.5)
 
 def write_to_hdf_fixed(df):
     df.to_hdf('Data/Fixation_durations_complete.hdf','complete',mode='w')
+
+def write_to_pkl(df):
+    with open("Data/Fixation_durations_"+pm.language+".pkl","w") as f:
+        pickle.dump(df, f)
 
 def get_exp_data():
     convert_dict = {column:comma_to_dot for column in [0,1,2,3,4,5]}
@@ -39,13 +45,16 @@ def get_exp_data():
     for i,value in enumerate(saccade_data.loc[:,'haveFirstPass']):
         if value == 0 and (saccade_data.loc[i-1,'haveFirstPass'] == 1) and (saccade_data.loc[i+1,'haveFirstPass']== 1):
             saccade_data.loc[i,'one wordskip'] = True
-    write_to_hdf_fixed(saccade_data)
+    with open("Data/Fixation_durations_"+pm.language+".pkl","w") as f:
+        pickle.dump(saccade_data, f)
+    write_to_pkl(saccade_data)
     return saccade_data
 
 def read_exp_data():
-    filename = 'Data/Fixation_durations_complete.hdf'
-    if os.path.isfile('Data/Fixation_durations_complete.hdf'):
-        return pd.read_hdf('Data/Fixation_durations_complete.hdf','complete')
+    filename = "Data/Fixation_durations_"+pm.language+".pkl"
+    if os.path.isfile(filename):
+        with open(filename,"r") as f:
+            return pickle.load(f)
     else:
         return get_exp_data()
 
@@ -349,7 +358,21 @@ def get_pred():
 
 def get_freq_and_pred():
     convert_dict = {0:decode_ISO,1:comma_to_dot, 2:comma_to_dot}
-    my_data = np.genfromtxt("Texts/PSCall_freq_pred.txt", names =True, dtype=['U20','f4','f4'], converters = convert_dict, skip_header=0, delimiter="\t")
+    # Changed this, old code threw an decode error
+    my_data = pd.read_csv("Texts/PSCall_freq_pred.txt",delimiter="\t")
+#    my_data = np.genfromtxt("Texts/PSCall_freq_pred.txt", names =True,encoding="latin-1",  dtype=['U2','f4','f4'], converters = convert_dict, skip_header=0, delimiter="\t")
+    predictions_dict = {}
+    return my_data
+
+def get_freq_and_syntax_pred():
+    convert_dict = {0:decode_ISO,1:comma_to_dot, 2:comma_to_dot}
+    # Changed this, old code threw an decode error
+    my_data = pd.read_csv("Texts/PSCall_freq_pred.txt",delimiter="\t")
+    sys.path.append("Data")
+    print("Using syntax pred values")
+    with open("Data/PSCALLsyntax_probabilites.pkl", "r") as f:
+        my_data["pred"] = pickle.load(f)
+#    my_data = np.genfromtxt("Texts/PSCall_freq_pred.txt", names =True,encoding="latin-1",  dtype=['U2','f4','f4'], converters = convert_dict, skip_header=0, delimiter="\t")
     predictions_dict = {}
     return my_data
 

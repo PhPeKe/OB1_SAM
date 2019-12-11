@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Author: J.J. Snell & S.G. van Leipsig
 # supervised by dr. M. Meeter
 # 01-07-15
@@ -19,48 +20,85 @@ from numpy import testing
 import pickle
 import parameters as pm
 import sys
+import io
+import os
 if pm.visualise:
     import Visualise_reading
 
 
 ##TODO calling dictionary with string is slightly faster than with integer!, for clarity use string/word in dictionaries
 
-def reading_simulation(filename):
+def reading_simulation(filename, parameters):
+
+    if any(parameters):
+#        pm.decay = parameters[0]
+#        pm.bigram_to_word_excitation = parameters[1]
+#        pm.bigram_to_word_inhibition = parameters[2]
+#        pm.word_inhibition = parameters[3]
+#        pm.max_activity = parameters[4]
+#        pm.max_attend_width = int(parameters[5])
+#        pm.min_attend_width = int(parameters[6])
+#        pm.attention_skew = parameters[7]
+#        pm.bigram_gap = int(parameters[8])
+#        pm.min_overlap = int(parameters[9])
+#        pm.refix_size = parameters[10]
+#        pm.salience_position = parameters[11]
+#        pm.sacc_optimal_distance = parameters[12]
+#        pm.saccErr_scaler = parameters[13]
+        pm.saccErr_sigma = abs(parameters[0])
+        pm.saccErr_sigma_scaler = parameters[1]
+        pm.mu = parameters[2]
+        pm.sigma = parameters[3]
+#        pm.distribution_param = parameters[18]
+#        pm.wordfreq_p = parameters[19]
+#        pm.wordpred_p = parameters[20]
+
 
     lexicon = []
     all_data = []
     individual_words = []
 
     # function input, filename, should be a string of the exact textfile name and path.
-    #textfile = get_stimulus_text_from_file(filename)
-    #textsplitbyspace = textfile.split(" ")
-    textsplitbyspace = pickle.load(open("Data/nederlands/words_dutch.pkl"))
-#    textsplitbyspace = textsplitbyspace[:1000]
+    if ".txt" in filename:
+        textfile = get_stimulus_text_from_file(filename)
+        textsplitbyspace = textfile.split(" ")
+    if ".pkl" in filename:
+        textsplitbyspace = pickle.load(open(filename))
+#        textsplitbyspace = textsplitbyspace[:1000]
     for word in textsplitbyspace:
         if word.strip()!="":
             new_word = unicode(word.strip())  # make sure words are unicode (numpy.unicode_ can cause errors)
             individual_words.append(new_word)
     target_words = []
     target_word_sf = []
-    target_word_gd = [] 
+    target_word_gd = []
     target_word_refixs = []
     target_word_act = []
-    
+
 #    with open(r'C:\Users\Josh\Desktop\josh work\Experiments\BOB\sam reading model july15\sam reading model july15\PSC\target_positions.txt') as file:
 #        target_positions = file.readlines()
 #    for i in range(0,len(target_positions)):
 #        target_positions[i] = int(target_positions[i].replace('\n',''))
 #    print target_positions
-        
+
 
     # load dicts for threshold
-    # word_freq_dict, word_pred_values = get_freq_pred_files()
-    word_freq_dict = pickle.load(open("Data/nederlands/freq.pkl"))
-    word_pred_values = np.ones(len(textsplitbyspace))
-    word_pred_values[:] = 0.1
-    pickle.dump([word_freq_dict,word_pred_values],open("Data/freq_pred.pkl", "w"))
+    if pm.language == "german":
+        word_freq_dict, word_pred_values = get_freq_pred_files()
+        # Replace prediction values with syntactic probabilities
+        if pm.use_grammar_prob:
+            sys.path.append("Data")
+            with open("Data/PSCALLsyntax_probabilites.pkl","r") as f:
+                word_pred_values = pickle.load(f)
+
+    if pm.language == "dutch":
+        word_freq_dict = pickle.load(open("Data/nederlands/freq.pkl"))
+        word_pred_values = np.ones(len(textsplitbyspace))
+        word_pred_values[:] = 0.1
+#    pickle.dump([word_freq_dict,word_pred_values],open("Data/freq_pred.pkl", "w"))
     max_frequency_key = max(word_freq_dict, key=word_freq_dict.get)
     max_frequency = word_freq_dict[max_frequency_key]
+    print("Length text: "+str(len(individual_words))+"\nLength pred: "+str(len(word_pred_values)))
     word_pred_values = word_pred_values[0:len(individual_words)]
     max_predictability = np.max(word_pred_values)
     min_predictability = np.min(word_pred_values)
@@ -108,7 +146,7 @@ def reading_simulation(filename):
         for freq_word in word_freq_dict.keys():
             if freq_word not in lexicon:
                 lexicon.append(freq_word.lower())
-                
+
     print "size lexicon after freq: "+str(len(lexicon))
     lexicon_file_name = 'Data/Lexicon.dat'
     with open(lexicon_file_name,"w") as f:
@@ -123,7 +161,7 @@ def reading_simulation(filename):
 
     # Normalize word inhibition to the size of the lexicon. 
     lexicon_normalized_word_inhibition = (100.0/LEXICON_SIZE) * pm.word_inhibition
-            
+
     # Set activation of all words in lexicon to zero and make bigrams for each word.
     lexicon_word_activity = {}
     lexicon_word_bigrams = {}
@@ -166,8 +204,8 @@ def reading_simulation(filename):
     print ""
 
 #-----------------------------------------------------------------------------------------
-    print "Setting up word-to-word inhibition grid..." 
-    
+    print "Setting up word-to-word inhibition grid..."
+
     # Set up the list of word inhibition pairs, with amount of bigram/monograms overlaps for every pair.
     #initialize inhibition matrix with false
     #word_inhibition_matrix = np.zeros((LEXICON_SIZE,LEXICON_SIZE),dtype=bool)
@@ -232,7 +270,7 @@ def reading_simulation(filename):
 
     print "Inhibition grid ready."
     print ""
-  #---------------------------------------------------------------------------      
+  #---------------------------------------------------------------------------
     print "BEGIN READING"
     print ""
     print ""
@@ -317,7 +355,10 @@ def reading_simulation(filename):
         # ##Test the allocation
         my_print( "ALLOCATED:",already_allocated,allocated_dict.keys())
         for i in already_allocated:
-            print lexicon[i],
+            try:
+                print lexicon[i]
+            except:
+                print "Escaping annoying encoding error while printing"
             if not regression and i == individual_to_lexicon_indices[fixation]:
                 N_in_allocated += 1
                 to_pauze = True
@@ -370,7 +411,7 @@ def reading_simulation(filename):
             stimulus = " "+individual_words[fixation-2]+" "+individual_words[fixation-1]+" "+individual_words[fixation]+" "
             EyePosition = len(individual_words[fixation-2]) + len(individual_words[fixation-1]) +  round(len(individual_words[fixation])*0.5) + 2 + OffsetFromWordCenter
         elif fixation+2 == TOTAL_WORDS:
-            stimulus = " "+individual_words[fixation-2]+" "+individual_words[fixation-1]+" "+individual_words[fixation]+" "+individual_words[fixation+1]+" "            
+            stimulus = " "+individual_words[fixation-2]+" "+individual_words[fixation-1]+" "+individual_words[fixation]+" "+individual_words[fixation+1]+" "
             EyePosition = len(individual_words[fixation-2]) + len(individual_words[fixation-1]) +  round(len(individual_words[fixation])*0.5) + 2 + OffsetFromWordCenter
         elif fixation-2 == 0:
             stimulus = " "+individual_words[fixation-2]+" "+individual_words[fixation-1]+" "+individual_words[fixation]+" "+individual_words[fixation+1]+" "+individual_words[fixation+2]+" "
@@ -404,7 +445,7 @@ def reading_simulation(filename):
         wordskip_pass = 0
 
         my_print('attendWidth',attendWidth)
-   
+
        # These parameters may be set to True if a wordskip or regression needs to be done.
        # This will influence where the eyes move, (see bottom of the code).
         if wordskip == True:
@@ -446,15 +487,20 @@ def reading_simulation(filename):
         # At this point, stimulus, bigrams and weights for the current stimulus are defined. Now prepare for entering
         # the cycle-loop that builds word activity with every cycle.
         my_print("fixation: ",individual_words[fixation])
-        my_print("stimulus: ",stimulus)
+	try:
+	        with open("bot.txt","w") as f:
+			f.write("Word number "+str(fixation)+": "+unicode(str(individual_words[fixation])))
+	except:
+		print("woops")
+	my_print("stimulus: ",stimulus)
         #print 'EyePostition:',EyePosition
-        
+
         amount_of_cycles = 0
         amount_of_cycles_since_attention_shifted = 0
 
         shift = False
         AttentionPosition = EyePosition
-        
+
         #this is the position of the first letter that is at the right of the middle of the fixation word
         fixationFirstPositionRightToMiddle = None
         fixationFirstPositionLeftToMiddle = None
@@ -611,13 +657,13 @@ def reading_simulation(filename):
                         # wordExcitationInput = bigram_activation_set(lexicon_word,allBigrams_set,lexicon_word_bigrams_set,unitActivations)
                         # wordExcitationInput1 = bigram_activation_set_fast(lexicon_word,allBigrams_set,lexicon_word_bigrams_set,unitActivations)
                         # wordExcitationInput2 = bigram_activation_set_fast2(lexicon_word,allBigrams_set,lexicon_word_bigrams_set,unitActivations)
-        
+
                         # ##Speed testing monogram functions, Fastest -> monogram_activation_list
                         # wordExcitationInput1m = monogram_activation_list(lexicon_word,allMonograms,lexicon_word_bigrams,unitActivations)
                         # wordExcitationInput2m = monogram_activation_list2(lexicon_word,allMonograms_set,lexicon_word_bigrams,unitActivations)
                         # wordExcitationInput3m = monogram_activation_set(lexicon_word,allMonograms_set,lexicon_word_bigrams,unitActivations)
                         ## could use numpy, lexicon as numpy.char and np.intersect1d
-        
+
                         ## (Fast) Bigram & Monogram activations
                         bigram_intersect_list = allBigrams_set.intersection(lexicon_word_bigrams[lexicon_word])
                         for bigram in bigram_intersect_list:
@@ -625,7 +671,7 @@ def reading_simulation(filename):
                         for monogram in allMonograms:
                             if monogram in lexicon_word:
                                 wordExcitationInput+= pm.bigram_to_word_excitation * unitActivations[monogram]
-        
+
                         # # ## Slow bigram & monogram activations
                         # wordExcitationInput2 = 0
                         # #wordBigramsInhibitionInput = 0
@@ -641,9 +687,9 @@ def reading_simulation(filename):
                         #     if monogram in lexicon_word:
                         #         wordExcitationInput2+= pm.bigram_to_word_excitation * unitActivations[monogram]
                         #     #wordBigramsInhibitionInput += pm.bigram_to_word_inhibition * unitActivations[monogram]
-        
+
                         word_input_np[lexicon_ix] = wordExcitationInput + wordBigramsInhibitionInput
-        
+
                         if lexicon_word == individual_words[fixation] :
                             crt_fixation_word_activities_np[amount_of_cycles,0] = wordExcitationInput
                             crt_fixation_word_activities_np[amount_of_cycles,1] = abs(wordBigramsInhibitionInput)
@@ -989,6 +1035,7 @@ def reading_simulation(filename):
 
         if fixation == TOTAL_WORDS-1:  # Check if end of text is reached.
             end_of_text = True
+            print("END REACHED!")
             continue
 
         my_print(regression,refixation,forward,wordskip)

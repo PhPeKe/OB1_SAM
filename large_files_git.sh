@@ -8,4 +8,4 @@ git rev-list --objects --all \
 | numfmt --field=2 --to=iec-i --suffix=B --padding=7 --round=nearest
 
 # Remove all large files in commit
-git filter-branch -f --index-filter 'git rm -f --cached --ignore-unmatch a b' HEAD
+git filter-branch --force --index-filter 'git rm -f --cached --ignore-unmatch a b' HEAD

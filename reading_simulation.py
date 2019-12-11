@@ -80,8 +80,6 @@ def reading_simulation(filename, parameters):
 #    for i in range(0,len(target_positions)):
 #        target_positions[i] = int(target_positions[i].replace('\n',''))
 #    print target_positions
-
-
     # load dicts for threshold
     if pm.language == "german":
         word_freq_dict, word_pred_values = get_freq_pred_files()
@@ -487,13 +485,6 @@ def reading_simulation(filename, parameters):
         # At this point, stimulus, bigrams and weights for the current stimulus are defined. Now prepare for entering
         # the cycle-loop that builds word activity with every cycle.
         my_print("fixation: ",individual_words[fixation])
-	try:
-	        with open("bot.txt","w") as f:
-			f.write("Word number "+str(fixation)+": "+unicode(str(individual_words[fixation])))
-	except:
-		print("woops")
-	my_print("stimulus: ",stimulus)
-        #print 'EyePostition:',EyePosition
 
         amount_of_cycles = 0
         amount_of_cycles_since_attention_shifted = 0

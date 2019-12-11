@@ -18,6 +18,7 @@ optimization method from *scipy*.
 
 
 ##How to use OB1
+
 **Running an experiment**:
 
 In order to run a "normal" experiment one should set "run_exp" and "analyze_results" to True.

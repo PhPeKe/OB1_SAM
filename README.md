@@ -1,4 +1,4 @@
-# OB1_SAM
+# OB1 reader
 OB1 is a reading-model that simulates the processes behind reading in the brain. 
 
 For more information about the theoretical aspects of OB1 and a validation of its reading capabilities see: https://www.ncbi.nlm.nih.gov/pubmed/30080066
@@ -21,11 +21,11 @@ optimization method from *scipy*.
 
 **Running an experiment**:
 
-In order to run a "normal" experiment one should set "run_exp" and "analyze_results" to True.
+In order to run a "normal" experiment one should set "run_exp" and "analyze_results" in *parameters.py* to True.
 
 **Parameter-tuning**
 
-For parameter-tuning set the parameters you wish to change in "get_parameters.py" and then 
-
-OB1 is a reading-model that simulates the processes behind reading in the brain. For more information about the theoretical aspects of OB1 and a validation of its reading capabilities see: https://www.ncbi.nlm.nih.gov/pubmed/30080066
-
+For parameter-tuning define the parameters you wish to change and their bounds in *get_parameters.py*. Then go to 
+*reading_simulation.py* where you have to unpack these values again based on the order in which they have been packed.
+ Next go to *parameters.py* and change "optimize" to True. Don't forget to set "run_exp" as well as "analyze_results" to
+  False if you want to **just optimize**.

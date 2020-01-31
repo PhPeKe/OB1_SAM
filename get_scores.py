@@ -10,6 +10,7 @@ import numpy as np
 from scipy import stats
 import pickle
 import pandas as pd
+import analyse_data_plot as mod
 import analyse_data_plot_qualitative as mod2
 from reading_common import get_stimulus_text_from_file
 import read_saccade_data as exp
@@ -45,6 +46,9 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
         df_freq_pred = exp.get_freq_and_syntax_pred()
     else:
         df_freq_pred = exp.get_freq_and_pred()
+
+    if pm.uniform_pred:
+        df_freq_pred["pred"][:] = 0.25
 
     df_freq_pred = df_freq_pred.iloc[0:len(df_individual_words),:]
     df_individual_words = pd.concat([df_individual_words,df_freq_pred],axis=1,join_axes=[df_individual_words.index])
@@ -130,6 +134,18 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
     with open("simulation.pkl","w") as f:
         pickle.dump(simulation,f)
 
+    t = time()
+    if pm.include_sacc_type_sse:
+        exp_sacctype_grpby_prob_dict = exp.get_grouped_sacctype_prob(freqbins,predbins)
+        sse_pred = mod.sse_sacctypeprob_bygroup(df_alldata_grouped_all,exp_sacctype_grpby_prob_dict,freqbins,predbins)
+        with open("sse_pred.txt", "a") as f:
+            f.write(str(t)+str(int(sse_pred))+"\n")
+
+    if pm.include_sacc_dist_sse:
+        sse_dist = mod.sse_saccdistance(df_alldata_no_regr, exp.get_sacc_distance())
+        with open("sse_saccdist.txt", "a") as f:
+            f.write(str(t)+str(int(sse_dist))+"\n")
+
     plt.close()
     fig, ax = plt.subplots(2, 3, sharex='col', sharey='row')
     ax = ax.ravel()
@@ -176,7 +192,6 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
             divergences[name] = kl_divergence(x,y)
             total_divergence += divergences[name]
         plot = True
-        t = time()
         if plot:
             ax[i].plot(x, "b")  # Experiment
             ax[i].plot(y, "r")  # Simulation
@@ -185,6 +200,13 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
     blue_line = mlines.Line2D([], [], color="blue")
     red_line = mlines.Line2D([], [], color="red")
     plt.figlegend(handles=[red_line, blue_line], labels=["Simulation", "Experiment"], loc='upper right')
+
+    # Add specific sse's if wanted
+    if pm.include_sacc_type_sse:
+        sse += sse_pred
+    if pm.include_sacc_dist_sse:
+        sse += sse_dist
+
     suptitle = plt.suptitle("SSE: "+str(round(sse, 4)), y=1.02)
     fig.tight_layout()
     plt.savefig("test_density"+str(int(t))+".png", bbox_extra_artists=(suptitle, ), bbox_inches="tight", dpi=300)

@@ -1,5 +1,6 @@
 __author__ = 'Sam van Leipsig'
 
+from time import time
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
@@ -11,6 +12,7 @@ import math
 import pickle
 from read_saccade_data import get_freq_pred_files
 from reading_common import get_stimulus_text_from_file
+import parameters as pm
 #from pandas.stats.moments import ewma
 
 
@@ -224,6 +226,27 @@ def plot_saccdistance(df_alldata_no_regr,exp_saccade_distance):
     plt.savefig('plots/saccade_distance.png', dpi=300)
 
 
+def sse_saccdistance(df_alldata_no_regr,exp_saccade_distance):
+    ## Saccade distance (preceding)
+    plt.figure("Saccade distance")
+    plt.title("Saccade distance")
+    df_alldata_selection = df_alldata_no_regr[['foveal word text index','saccade distance','after wordskip']]
+    df_SF_sacc_distance = df_alldata_selection.groupby(['foveal word text index']).filter(lambda x: len(x)==1)
+    total_words = len(df_alldata_no_regr[['saccade distance','foveal word text index']].groupby('foveal word text index').max())
+    saccade_distance = df_SF_sacc_distance['saccade distance']
+    saccade_distance = saccade_distance.map(abs)
+    sacc_distance_groups = pd.cut(saccade_distance, np.arange(-5,25,1))
+    sacc_distance = saccade_distance.groupby(sacc_distance_groups).count() / float(total_words)
+    sacc_distance.plot(style = 'b')
+    exp_saccade_distance.plot(style = 'g--')
+    plt.legend(['Sim.','Exp.'])
+    sse_dist = (((sacc_distance-exp_saccade_distance)*3000)**2).sum()
+    plt.xlabel("SSE:"+str(int(sse_dist)))
+    t = time()
+    plt.savefig(str(t)+'sse_saccdist.png', dpi=300)
+    return sse_dist
+
+
 def plot_saccdistance2(df_alldata_no_regr, exp_saccade_distance):
     ## Saccade distance by saccade type(preceding)
     df_alldata_selection = df_alldata_no_regr[['foveal word text index','saccade distance','after wordskip']]
@@ -378,6 +401,89 @@ def plot_sacctypeprob_bygroup(df_alldata_grouped_all,exp_sacctype_grpby_prob_dic
     axes[2].set_xticklabels(['Low','Med','High'])
     axes[2].legend(['Sim. Regressions','Sim. Refixations','Sim. Wordskips','Exp. Regressions','Exp. Refixations','Exp. Wordskips'], loc=2,prop={'size':12})
     plt.savefig('plots/saccade_types_grouped.png', dpi=300)
+
+
+def sse_sacctypeprob_bygroup(df_alldata_grouped_all,exp_sacctype_grpby_prob_dict,freqbins,predbins):
+    maketrue = lambda col: 1 if np.sum(col)>0 else 0
+    # funcdict = {'columnname':function}
+    # df_sacctypes1 =  df_alldata_grouped[['regressed','refixated','wordskipped']].agg(maketrue)
+    df_sacctypes = df_alldata_grouped_all.loc[:,['regressed','refixated','wordskipped','word length','pred','freq']]
+    print "wordskip==regressed:", len(df_sacctypes[(df_sacctypes['regressed']==True) & (df_sacctypes['wordskipped']==True)])
+    print "wordskip<regressed:",len(df_sacctypes[(df_sacctypes['regressed']==True) & (df_sacctypes['wordskipped']==False)])
+    print "wordskip>regressed:",len(df_sacctypes[(df_sacctypes['regressed']==False) & (df_sacctypes['wordskipped']==True)])
+    df_sacctypes_grpby_length = df_sacctypes.drop(['freq','pred'],1).groupby(['word length']).sum()
+    groupsizes_length = df_sacctypes.drop(['freq','pred'],1).groupby(['word length']).size()
+    word_freq_groups_sacc = pd.cut(df_sacctypes['freq'], freqbins)
+    df_sacctypes_grpby_freq = df_sacctypes.drop(['word length','freq','pred'],1).groupby(word_freq_groups_sacc).sum()
+    groupsizes_freq = df_sacctypes.drop(['word length','freq','pred'],1).groupby(word_freq_groups_sacc).size()
+    word_pred_groups_sacc = pd.cut(df_sacctypes['pred'], predbins)
+    df_sacctypes_grpby_pred = df_sacctypes.drop(['word length','freq','pred'],1).groupby(word_pred_groups_sacc).sum()
+    groupsizes_pred = df_sacctypes.drop(['word length','freq','pred'],1).groupby(word_pred_groups_sacc).size()
+    print groupsizes_length
+
+    df_sacctypes_grpby_length_prob = df_sacctypes_grpby_length.div(groupsizes_length, axis=0)
+    df_sacctypes_grpby_freq_prob = df_sacctypes_grpby_freq.div(groupsizes_freq, axis=0)
+    df_sacctypes_grpby_pred_prob = df_sacctypes_grpby_pred.div(groupsizes_pred, axis=0)
+
+    # SSE for length
+    result_length = df_sacctypes_grpby_length_prob - exp_sacctype_grpby_prob_dict['length']
+    sse_length = ((result_length * 1000)**2).sum().sum()
+    # SSE for freq
+    result_freq = df_sacctypes_grpby_freq_prob - exp_sacctype_grpby_prob_dict['freq']
+    sse_freq = ((result_freq * 1000)**2).sum().sum()
+    # SSE for pred
+    result_pred = df_sacctypes_grpby_pred_prob - exp_sacctype_grpby_prob_dict['pred']
+    sse_pred = ((result_pred * 1000)**2).sum().sum()
+    # Total SSE
+    sse_total = sse_length + sse_freq + sse_pred
+
+    t = time()
+
+    # Plot
+    fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(15,5),sharey=True)
+    fig.canvas.set_window_title('Grouped saccade type prob')
+    fig.suptitle('Saccade type probability',fontsize= 20)
+    axes[0].set_ylabel('fixation probability')
+    axes[0].set_ylim([0,1])
+
+    axes[0].set_xlabel('word length\n'+str(sse_length))
+
+    df_sacctypes_grpby_length_prob.plot(ax=axes[0], style = ['r','g','b'])
+    exp_sacctype_grpby_prob_dict['length'].plot(ax=axes[0], style = ['r--','g--','b--'])
+    df_sacctypes_grpby_freq_prob.plot(ax=axes[1], style = ['r','g','b'])
+    axes[0].legend(['Sim. Regressions','Sim. Refixations','Sim. Wordskips','Exp. Regressions','Exp. Refixations','Exp. Wordskips'], loc=2,prop={'size':12})
+    exp_sacctype_grpby_prob_dict['freq'].plot(ax=axes[1], style = ['r--','g--','b--'])
+
+    axes[1].set_xlabel('Log frequency\n'+str(sse_freq))
+
+    axes[1].set_xticks([0,1,2])
+    axes[1].set_xticklabels(['Low','Medium',"High"])
+    axes[1].legend(['Sim. Regressions','Sim. Refixations','Sim. Wordskips','Exp. Regressions','Exp. Refixations','Exp. Wordskips'], loc=2,prop={'size':12})
+    df_sacctypes_grpby_pred_prob.plot(ax=axes[2], style = ['r','g','b'])
+    exp_sacctype_grpby_prob_dict['pred'].plot(ax=axes[2],style = ['r--','g--','b--'])
+    axes[2].set_xticks([0,1,2])
+
+    axes[2].set_xlabel('Predictability\n'+str(sse_pred))
+
+    axes[2].set_xticklabels(['Low','Med','High'])
+    axes[2].legend(['Sim. Regressions','Sim. Refixations','Sim. Wordskips','Exp. Regressions','Exp. Refixations','Exp. Wordskips'], loc=2,prop={'size':12})
+
+    plt.savefig(str(t)+'_pred_sse.png', dpi=300)
+    plt.close()
+
+    print("SSE saccade_type_prob:")
+    print("length:"+str(sse_length))
+    print("freq:"+str(sse_freq))
+    print("pred:"+str(sse_pred))
+    print("total:"+str(sse_total))
+
+    if pm.sacc_type_objective == "length":
+        return sse_length
+    if pm.sacc_type_objective == "freq":
+        return sse_freq
+    if pm.sacc_type_objective == "pred":
+        return sse_pred
+    return sse_total
 
 
 ##TODO find out why lagsucc SF duration differ so much

@@ -2,7 +2,6 @@
 # CHANGED
 from reading_simulation import reading_simulation
 from analyse_data_pandas import get_results
-from create_name import create_name_josh
 import multiprocessing as mp
 import pickle
 import cProfile

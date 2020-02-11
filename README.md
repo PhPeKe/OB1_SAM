@@ -2,29 +2,31 @@
 OB1 is a reading-model that simulates the processes behind reading in the brain. 
 
 For more information about the theoretical aspects of OB1 and a validation of it's reading capabilities 
-see: https://www.ncbi.nlm.nih.gov/pubmed/30080066
+see: 
 
-### *parameters.py*
+https://www.ncbi.nlm.nih.gov/pubmed/30080066
+
+### parameters.py
 This is the most important function for controlling the behavior of *main.py*. Here the user can specify which parts of the programm should be run and also set the initial parameters when tuning. Furthermore the user can define which measures are used as error-function for the tuning process. 
 
 N.B. To change the language, you need a text file and a lexicon file. Simulations currently run on the German Potsdam corpus. For Dutch a lexicon with most frequent words is provided, but there is not coprus with correctly formatted eye-tracking data available yet to compare the performance of the reading simlulation to.
 
-### *main.py*
+### main.py
 In this file the main programm flow is defined. It has calls to the reading function, which simulates the actual reading, as imported from *reading_simulation.py*, the analyze function as imported from *analyse_data_pandas.py* and the optimize function, which is **scipy's** *L-BFGS-B* optimizing method. The function called by this optimizing method is a wrapper that takes the parameters called in *parameters.py* and feeds them to the reading simulation. The optimize function makes use of a slightly adapted version of the analyzing function that can be found in *get_scores.py*.
 
-### *reading_simulation.py*
-This file embodies the heart of the whole programm, the reading simulation. Here the input text is fed into the visuo-spatial representation which is activating bigramm-matrices, which in turn are activating words that are recognized. The resulting (correctly or incorrectly) recognized words are saved in **all_data**, together with a set of descriptive variables. At the end of the simulation this data-representation of the reading process is saved as a pickle file (*all_data<input_language>.pkl*) for analysis in a later stage together with all **unrecognized_words** (*unrecognized_INPUT_LANGUAGE.pkl*).
+### reading_simulation.py
+This file embodies the heart of the whole programm, the reading simulation. Here the input text is fed into the visuo-spatial representation which is activating bigramm-matrices, which in turn are activating words that are recognized. The resulting (correctly or incorrectly) recognized words are saved in **all_data**, together with a set of descriptive variables. At the end of the simulation this data-representation of the reading process is saved as a pickle file ( *all_data_INPUT_LANGUAGE.pkl* ) for analysis in a later stage together with all **unrecognized_words** ( *unrecognized_INPUT_LANGUAGE.pkl* ).
 
-### *reading_common.py*
+### reading_common.py
 Helper-functions for the reading simulation in *reading_simulation.py* 
 
-### *read_saccade_data.py*
+### read_saccade_data.py
 This file provides functions to read in the eye-tracking data collected during the experiment where participants had to read the same text that is presented to the OB1-reader.
 
-### *analyse_data_plot.py* / *analyse_data_plot_qualitative.py*
+### analyse_data_plot.py / analyse_data_plot_qualitative.py
 In this files the result of a single experiment is analyzed and plots as seen in the publication are produced.
 
-### *analyse_data_transformation* / *analyse_data_pandas.py*
+### analyse_data_transformation / analyse_data_pandas.py
 These files are providing various functions to analyze the data used in *analyse_data_pandas.py*
 
 ## Modes

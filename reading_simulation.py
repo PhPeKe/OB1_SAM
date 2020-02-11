@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Author: J.J. Snell & S.G. van Leipsig
 # supervised by dr. M. Meeter
@@ -44,18 +45,18 @@ def reading_simulation(filename, parameters):
 #        pm.min_overlap = int(parameters[9])
 #        pm.refix_size = parameters[10]
 
-        pm.salience_position = parameters[0]
-        pm.sacc_optimal_distance = parameters[1]
+#        pm.salience_position = parameters[1]
+#        pm.sacc_optimal_distance = parameters[2]
 
 #        pm.saccErr_scaler = parameters[13]
 #        pm.saccErr_sigma = abs(parameters[0])
 #        pm.saccErr_sigma_scaler = parameters[1]
 
-        pm.mu = parameters[2]
-        pm.sigma = parameters[3]
-        pm.distribution_param = parameters[4]
-#        pm.wordfreq_p = parameters[7]
-#        pm.wordpred_p = parameters[8]
+#        pm.mu = parameters[3]
+#        pm.sigma = parameters[4]
+#        pm.distribution_param = parameters[5]
+        pm.wordfreq_p = parameters[0]
+        pm.wordpred_p = parameters[1]
 
 
     lexicon = []

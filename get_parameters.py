@@ -46,13 +46,13 @@ def get_params(pm):
 	#bounds.append((0, 2))
 	#names.append("refix_size")
 
-	parameters.append(pm.salience_position)
-	bounds.append((0, 5))
-	names.append("salience_position")
+#	parameters.append(pm.salience_position)
+#	bounds.append((0, 5))
+#	names.append("salience_position")
 
-	parameters.append(pm.sacc_optimal_distance)
-	bounds.append((3, 10))
-	names.append("sacc_optimal_distance")
+#	parameters.append(pm.sacc_optimal_distance)
+#	bounds.append((3, 10))
+#	names.append("sacc_optimal_distance")
 
 	#parameters.append(pm.saccErr_scaler)
 	#bounds.append((0, 3))
@@ -66,24 +66,24 @@ def get_params(pm):
 	#bounds.append((0, 1))
 	#names.append("sacc_err_sigma_scaler")
 
-	parameters.append(pm.mu)
-	bounds.append((1, 10))
-	names.append("mu")
+#	parameters.append(pm.mu)
+#	bounds.append((1, 10))
+#	names.append("mu")
 
-	parameters.append(pm.sigma)
-	bounds.append((0.5, 8))
-	names.append("sigma")
+#	parameters.append(pm.sigma)
+#	bounds.append((0.5, 8))
+#	names.append("sigma")
 
-	parameters.append(pm.distribution_param)
-	bounds.append((0.5, 5))
-	names.append("distribution_param")
+#	parameters.append(pm.distribution_param)
+#	bounds.append((0.5, 5))
+#	names.append("distribution_param")
 
-#	parameters.append(pm.wordfreq_p)
-#	bounds.append((1,15))
-#	names.append("wordfreq_p")
+	parameters.append(pm.wordfreq_p)
+	bounds.append((1,15))
+	names.append("wordfreq_p")
 
-#	parameters.append(pm.wordpred_p)
-#	bounds.append((1,15))
-#	names.append("wordpred_p")
+	parameters.append(pm.wordpred_p)
+	bounds.append((1,15))
+	names.append("wordpred_p")
 
         return parameters, bounds, names

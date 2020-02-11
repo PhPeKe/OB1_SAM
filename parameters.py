@@ -6,12 +6,12 @@ __author__ = 'Sam van Leipsig, Phillip Kersten'
 print("Parameters Initialised")
 
 # Control-flow parameters
-run_exp = False  # Should the reading simulation run?
-analyze_results = False  # Should the results be analyzed?
-optimize = True  # Should the parameters be optimized?
+run_exp = True  # Should the reading simulation run?
+analyze_results = True  # Should the results be analyzed?
+optimize = False  # Should the parameters be optimized?
 
 language = "german"  # german, dutch
-use_grammar_prob = False # True  # True for using grammar probabilities, False for using cloze, overwritten by uniform_pred
+use_grammar_prob = False # True for using grammar probabilities, False for using cloze, overwritten by uniform_pred
 uniform_pred = False  # Overwrites cloze/grammar probabilities with 0.25 for all words
 
 include_sacc_type_sse = True  # Include the sse score based on the saccade type probability plot
@@ -59,11 +59,11 @@ max_activity = 1.3
 ## Attentional width
 max_attend_width = 5.0
 min_attend_width = 3.0
-attention_skew = 1 # 4  #2.39 (optimal) # 1 equals symmetrical distribution # 4 (paper)
+attention_skew = 7.9 # 4  #2.39 (optimal) # 1 equals symmetrical distribution # 4 (paper)
 bigram_gap = 3 # 6 (optimal) # 3 (paper)
 min_overlap = 2
 refix_size = 0.2
-salience_position = 1.29 # 5 (optimal) # 1.29 (paper)
+salience_position = 4.99 # 1.29 # 5 (optimal) # 1.29 (paper)
 corpora_repeats = 0
 
 
@@ -80,19 +80,19 @@ pauze_allocation_errors = False
 use_boundary_task = False
 
 ## Saccade error
-sacc_optimal_distance = 7.0 # 8.0 (optimal) # 7.0 (paper)
+sacc_optimal_distance = 9.99  # 3.1 # 7.0 # 8.0 (optimal) # 7.0 (paper)
 saccErr_scaler = 0.2  # to determine avg error for distance difference
 saccErr_sigma = 0.17 # basic sigma
 saccErr_sigma_scaler = 0.06 # effect of distance on sigma
 
 ## Fixation duration# s
-mu, sigma = 4.9 , 2.2 # 4.9, 2.2 # 5.46258 (optimal), 4 # 4.9, 2.2 (paper)
-distribution_param = 1.1
+mu, sigma = 10.09 , 5.36 # 4.9, 2.2 # 5.46258 (optimal), 4 # 4.9, 2.2 (paper)
+distribution_param = 5.0  #1.1
 
 ## Threshold parameters
 linear = False
-wordfreq_p = 5.5 # 9 (optimal) # 5.5 (paper)
-wordpred_p = 9.0
+wordfreq_p = 1 # 5.5 # 9 (optimal) # 5.5 (paper)
+wordpred_p = 1 # 9.0
 
 #linear
 start_lin = 0.057

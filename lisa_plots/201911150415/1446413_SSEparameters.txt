@@ -1,6 +1,0 @@
-,0,1
-0,attention_skew,2.39834244932
-1,salience_position,5.0
-2,mu,5.36258216072
-3,sigma,4.0
-4,wordfreq_p,15.0

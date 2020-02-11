@@ -344,6 +344,12 @@ def get_saccade_data_df():
     saccade_data = pd.DataFrame(my_arrays)
 
 
+def get_freq():
+    convert_dict = {0:decode_ISO,1:comma_to_dot, 2:comma_to_dot}
+    my_data = np.genfromtxt("Texts/PSCall_freq_pred.txt", names =True, dtype=['U20','f4','f4'], converters = convert_dict, skip_header=0, delimiter="\t")
+    return my_data['freq']
+
+
 def get_pred():
     convert_dict = {0:decode_ISO,1:comma_to_dot, 2:comma_to_dot}
     my_data = np.genfromtxt("Texts/PSCall_freq_pred.txt", names =True, dtype=['U20','f4','f4'], converters = convert_dict, skip_header=0, delimiter="\t")

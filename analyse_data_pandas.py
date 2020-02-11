@@ -66,6 +66,8 @@ def get_results(input_text_filename,input_file_all_data,input_file_unrecognized_
                     df_freq_pred = exp.get_freq_and_pred()
                     if pm.use_grammar_prob:
                         df_freq_pred = exp.get_freq_and_syntax_pred()
+                    if pm.uniform_pred:
+                        df_freq_pred["pred"][:] = 0.25
 
                 if pm.language == "dutch":
                     df_freq_pred = pickle.load(open("Data/nederlands/freq500_2.pkl","r"))  # TODO 
@@ -186,6 +188,8 @@ def get_results(input_text_filename,input_file_all_data,input_file_unrecognized_
             mod.plot_saccadetype_probabilities(df_alldata_grouped_all,exp_sacc_dict)
             exp_sacctype_grpby_prob_dict = exp.get_grouped_sacctype_prob(freqbins,predbins)
             mod.plot_sacctypeprob_bygroup(df_alldata_grouped_all,exp_sacctype_grpby_prob_dict,freqbins,predbins)
+            ## FOR TESTING
+            mod.sse_sacctypeprob_bygroup(df_alldata_grouped_all,exp_sacctype_grpby_prob_dict,freqbins,predbins)
 
 
             ## Fixdur wordskips

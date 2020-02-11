@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 # Author: J.J. Snell & S.G. van Leipsig
 # supervised by dr. M. Meeter
@@ -11,7 +12,7 @@ import re
 from reading_common import stringToBigramsAndLocations, calcBigramExtInput, calcMonogramExtInput, get_stimulus_text_from_file, calc_word_attention_right
 from reading_functions import my_print, get_threshold, getMidwordPositionForSurroundingWord, is_similar_word_length, \
     calc_saccade_error, norm_distribution, normalize_pred_values
-from read_saccade_data import get_freq_pred_files
+from read_saccade_data import get_freq_pred_files, get_freq_and_syntax_pred
 from speed_testing import bigram_activation, bigram_activation_set, bigram_activation_set_fast, monogram_activation_list,\
     monogram_activation_set, bigram_activation_set_fast2, word_activations, word_activations2
 import pdb
@@ -38,20 +39,24 @@ def reading_simulation(filename, parameters):
 #        pm.max_activity = parameters[4]
 #        pm.max_attend_width = int(parameters[5])
 #        pm.min_attend_width = int(parameters[6])
-#        pm.attention_skew = parameters[7]
-#        pm.bigram_gap = int(parameters[8])
+
+#        pm.attention_skew = parameters[0]
+
 #        pm.min_overlap = int(parameters[9])
 #        pm.refix_size = parameters[10]
-#        pm.salience_position = parameters[11]
-#        pm.sacc_optimal_distance = parameters[12]
+
+#        pm.salience_position = parameters[1]
+#        pm.sacc_optimal_distance = parameters[2]
+
 #        pm.saccErr_scaler = parameters[13]
-        pm.saccErr_sigma = abs(parameters[0])
-        pm.saccErr_sigma_scaler = parameters[1]
-        pm.mu = parameters[2]
-        pm.sigma = parameters[3]
-#        pm.distribution_param = parameters[18]
-#        pm.wordfreq_p = parameters[19]
-#        pm.wordpred_p = parameters[20]
+#        pm.saccErr_sigma = abs(parameters[0])
+#        pm.saccErr_sigma_scaler = parameters[1]
+
+#        pm.mu = parameters[3]
+#        pm.sigma = parameters[4]
+#        pm.distribution_param = parameters[5]
+        pm.wordfreq_p = parameters[0]
+        pm.wordpred_p = parameters[1]
 
 
     lexicon = []
@@ -85,14 +90,15 @@ def reading_simulation(filename, parameters):
         word_freq_dict, word_pred_values = get_freq_pred_files()
         # Replace prediction values with syntactic probabilities
         if pm.use_grammar_prob:
-            sys.path.append("Data")
-            with open("Data/PSCALLsyntax_probabilites.pkl","r") as f:
-                word_pred_values = pickle.load(f)
-
-    if pm.language == "dutch":
-        word_freq_dict = pickle.load(open("Data/nederlands/freq.pkl"))
-        word_pred_values = np.ones(len(textsplitbyspace))
-        word_pred_values[:] = 0.1
+            word_pred_values = get_freq_and_syntax_pred()["pred"]
+        if pm.uniform_pred:
+            print("Replacing pred values with .25")
+            word_pred_values[:] = 0.25
+#
+#    if pm.language == "dutch":
+#        word_freq_dict = pickle.load(open("Data/nederlands/freq.pkl"))
+#        word_pred_values = np.ones(len(textsplitbyspace))
+#        word_pred_values[:] = 0.1
 #    pickle.dump([word_freq_dict,word_pred_values],open("Data/freq_pred.pkl", "w"))
     max_frequency_key = max(word_freq_dict, key=word_freq_dict.get)
     max_frequency = word_freq_dict[max_frequency_key]
@@ -157,7 +163,7 @@ def reading_simulation(filename, parameters):
     ## Make lexicon dependent variables
     LEXICON_SIZE = len(lexicon)
 
-    # Normalize word inhibition to the size of the lexicon. 
+    # Normalize word inhibition to the size of the lexicon.
     lexicon_normalized_word_inhibition = (100.0/LEXICON_SIZE) * pm.word_inhibition
 
     # Set activation of all words in lexicon to zero and make bigrams for each word.

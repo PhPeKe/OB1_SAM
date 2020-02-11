@@ -9,7 +9,7 @@ https://www.ncbi.nlm.nih.gov/pubmed/30080066
 ### parameters.py
 This is the most important function for controlling the behavior of *main.py*. Here the user can specify which parts of the programm should be run and also set the initial parameters when tuning. Furthermore the user can define which measures are used as error-function for the tuning process. 
 
-N.B. To change the language, you need a text file and a lexicon file. Simulations currently run on the German Potsdam corpus. For Dutch a lexicon with most frequent words is provided, but there is not coprus with correctly formatted eye-tracking data available yet to compare the performance of the reading simlulation to.
+N.B. To change the language, you need a text file and a lexicon file. Simulations currently run on the German Potsdam corpus. For Dutch a lexicon with most frequent words is provided, but there is no coprus with correctly formatted eye-tracking data available yet to compare the performance of the reading simulation to.
 
 ### main.py
 In this file the main programm flow is defined. It has calls to the reading function, which simulates the actual reading, as imported from *reading_simulation.py*, the analyze function as imported from *analyse_data_pandas.py* and the optimize function, which is **scipy's** *L-BFGS-B* optimizing method. The function called by this optimizing method is a wrapper that takes the parameters called in *parameters.py* and feeds them to the reading simulation. The optimize function makes use of a slightly adapted version of the analyzing function that can be found in *get_scores.py*.

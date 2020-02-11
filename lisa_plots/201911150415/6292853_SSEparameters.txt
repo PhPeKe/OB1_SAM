@@ -1,6 +1,0 @@
-,0,1
-0,attention_skew,1.0
-1,salience_position,5.0
-2,mu,2.0
-3,sigma,4.1
-4,wordfreq_p,15.0

@@ -1,3 +1,4 @@
+# -*- coding: UTF-8 -*-
 __author__ = 'Sam van Leipsig'
 
 import matplotlib
@@ -21,9 +22,9 @@ import parameters as pm
 
 
 def get_results(input_text_filename,input_file_all_data,input_file_unrecognized_words):
-    with open(input_file_all_data,"r") as f:
-        with open(input_file_unrecognized_words,"r") as g:
-            all_data = pickle.load(f)
+    with open(input_file_all_data,"rb") as f:
+        with open(input_file_unrecognized_words,"rb") as g:
+            all_data = pickle.load(f, encoding="latin1")
             if not os.path.exists("Plots/"):
                 os.makedirs("Plots/")
 

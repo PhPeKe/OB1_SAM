@@ -149,7 +149,7 @@ def make_word_measures_bylength(df_alldata):
 
 #    word_measures_dict['activity'] = df_only_word_activity.groupby('word length').apply(pd.to_numeric).mean()
     df_only_word_activity = df_only_word_activity.apply(pd.to_numeric)
-    with open("test_only_word_activity.pkl","w") as f:
+    with open("test_only_word_activity.pkl","wb") as f:
         pickle.dump(df_only_word_activity, f)
     word_measures_dict['activity'] = df_only_word_activity.groupby('word length').mean()
 

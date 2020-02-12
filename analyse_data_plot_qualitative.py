@@ -14,8 +14,8 @@ def get_neighbor_data(df_alldata_no_regr):
     ## Fix dur by neighborhoodsize
     ## UPDATED this to the clean version
     output_neighbors = 'Data/individualwords_neighbors_cleaned.dat'
-    with open( output_neighbors,"r") as b:
-        individual_words_neighbors = pickle.load(b)
+    with open( output_neighbors,"rb") as b:
+        individual_words_neighbors = pickle.load(b, encoding="latin1")
     df_alldata_to_group2 = df_alldata_no_regr[['fixation duration','word length','foveal word text index','word frequency']]
     df_alldata_grouped_neighbors = df_alldata_to_group2.groupby('foveal word text index', as_index= True).agg(
         {'fixation duration':np.sum,'word length':np.mean,'word frequency':np.mean})

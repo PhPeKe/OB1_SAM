@@ -76,11 +76,11 @@ if pm.run_exp:
     # Run the reading model
     (lexicon, all_data, unrecognized_words) = reading_simulation(filepath_psc, parameters=[])
     # Save results: all_data...
-    all_data_file = open(output_file_all_data,"w")
+    all_data_file = open(output_file_all_data,"wb")
     pickle.dump(all_data, all_data_file)
     all_data_file.close()
     # ...and unrecognized words
-    unrecognized_file = open(output_file_unrecognized_words, "w")
+    unrecognized_file = open(output_file_unrecognized_words, "wb")
     pickle.dump(unrecognized_words, unrecognized_file)
     unrecognized_file.close()
 

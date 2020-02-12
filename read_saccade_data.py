@@ -365,7 +365,7 @@ def get_pred():
 def get_freq_and_pred():
     convert_dict = {0:decode_ISO,1:comma_to_dot, 2:comma_to_dot}
     # Changed this, old code threw an decode error
-    my_data = pd.read_csv("Texts/PSCall_freq_pred.txt",delimiter="\t")
+    my_data = pd.read_csv("Texts/PSCall_freq_pred.txt",delimiter="\t", encoding="latin1")
 #    my_data = np.genfromtxt("Texts/PSCall_freq_pred.txt", names =True,encoding="latin-1",  dtype=['U2','f4','f4'], converters = convert_dict, skip_header=0, delimiter="\t")
     predictions_dict = {}
     return my_data
@@ -373,7 +373,7 @@ def get_freq_and_pred():
 def get_freq_and_syntax_pred():
     convert_dict = {0:decode_ISO,1:comma_to_dot, 2:comma_to_dot}
     # Changed this, old code threw an decode error
-    my_data = pd.read_csv("Texts/PSCall_freq_pred.txt",delimiter="\t")
+    my_data = pd.read_csv("Texts/PSCall_freq_pred.txt",delimiter="\t", encoding="latin1")
     sys.path.append("Data")
     print("Using syntax pred values")
     with open("Data/PSCALLsyntax_probabilites.pkl", "r") as f:

@@ -52,7 +52,7 @@ def correct_recognition(x):
             else:
                 return False
         else:
-                return False
+            return False
     else:
         return False
 
@@ -92,13 +92,13 @@ def preprocess_boundary_task(df_single_first_fixation, df_alldata_no_regr,df_ind
 
 
     ## POF
-    print "POF"
-    print df_SF_boundary_task_POF.groupby('boundary task condition').mean()
-    print df_GD_boundary_task_POF.groupby('boundary task condition').mean()
+    print("POF")
+    print(df_SF_boundary_task_POF.groupby('boundary task condition').mean())
+    print(df_GD_boundary_task_POF.groupby('boundary task condition').mean())
     ## Preview
-    print "Preview"
-    print df_SF_boundary_task_preview.groupby('boundary task condition').mean()
-    print df_GD_boundary_task_preview.groupby('boundary task condition').mean()
+    print("Preview")
+    print(df_SF_boundary_task_preview.groupby('boundary task condition').mean())
+    print(df_GD_boundary_task_preview.groupby('boundary task condition').mean())
 
     pdb.set_trace()
     return df_SF_boundary_task_POF, df_GD_boundary_task_POF

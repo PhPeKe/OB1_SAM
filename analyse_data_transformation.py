@@ -19,9 +19,9 @@ def correct_wordskips(df_alldata):
     wordskiplist2 = []
     df_alldata['after wordskip'] = df_alldata['wordskipped']
     for name,group in df_alldata_grouped:
-       if group.loc[:,'after wordskip'].any() == True:
-           wordskiplist.append(name-1)
-           wordskiplist2.append(name-2)
+        if group.loc[:,'after wordskip'].any() == True:
+            wordskiplist.append(name-1)
+            wordskiplist2.append(name-2)
     ##TODO apply in df_alldata_grouped
     df_alldata['wordskipped'] = df_alldata['foveal word text index'].isin(wordskiplist)
     df_alldata['before wordskip'] = df_alldata['foveal word text index'].isin(wordskiplist2)
@@ -29,7 +29,7 @@ def correct_wordskips(df_alldata):
     return df_alldata
 
 def correct_offset(df_alldata):
-    for i in xrange(0,len(df_alldata['Offset'])):
+    for i in range(0,len(df_alldata['Offset'])):
         if df_alldata.loc[i,'word length'] % 2 == 0:
             df_alldata.loc[i,'Offset']-=0.5
     return df_alldata
@@ -67,25 +67,25 @@ def sequential(x):
 def make_number_fixations(df_alldata_no_regr):
         ## Select specific fixation duration measures (single, first, second, third)
         ## Important to use sequential in filtering because after a regression a second pass fixation may count as SF
-        df_fixation_durations = df_alldata_no_regr.loc[:,['foveal word','fixation duration','foveal word text index','word predictability',
-                                                    'refixated','before wordskip','after wordskip','word length','word frequency','saccade distance',
-                                                    'relative landing position']]
-        df_fixations_sequential = df_fixation_durations.groupby(['foveal word text index']).filter(lambda x: sequential(x))
-        df_single_fixation = df_fixations_sequential.groupby(['foveal word text index']).filter(lambda x: len(x)==1)
-        first_fixation_grouped =  df_fixations_sequential.groupby(['foveal word text index'])
-        first_fixation_selection =  first_fixation_grouped.apply(lambda x: x.index[0]).values
-        df_first_fixation = df_fixation_durations.loc[first_fixation_selection,:]
+    df_fixation_durations = df_alldata_no_regr.loc[:,['foveal word','fixation duration','foveal word text index','word predictability',
+                                                'refixated','before wordskip','after wordskip','word length','word frequency','saccade distance',
+                                                'relative landing position']]
+    df_fixations_sequential = df_fixation_durations.groupby(['foveal word text index']).filter(lambda x: sequential(x))
+    df_single_fixation = df_fixations_sequential.groupby(['foveal word text index']).filter(lambda x: len(x)==1)
+    first_fixation_grouped =  df_fixations_sequential.groupby(['foveal word text index'])
+    first_fixation_selection =  first_fixation_grouped.apply(lambda x: x.index[0]).values
+    df_first_fixation = df_fixation_durations.loc[first_fixation_selection,:]
 
-        df_refixations = df_fixation_durations.groupby(['foveal word text index']).filter(lambda x: len(x)>1 and sequential(x))
-        df_refixations_grouped = df_refixations.groupby(['foveal word text index'])
-        first_fixation_selection_exclusive =  df_refixations_grouped.apply(lambda x: x.index[0]).values
-        second_fixation_selection = df_refixations_grouped.apply(lambda x: x.index[1]).values
-	print("------------df  fixation locations------------------")
-	print(df_fixation_durations)
-        df_first_fixation_exclusive = df_fixation_durations.loc[first_fixation_selection_exclusive,:]
-        df_second_fixation = df_fixation_durations.loc[second_fixation_selection,:]
+    df_refixations = df_fixation_durations.groupby(['foveal word text index']).filter(lambda x: len(x)>1 and sequential(x))
+    df_refixations_grouped = df_refixations.groupby(['foveal word text index'])
+    first_fixation_selection_exclusive =  df_refixations_grouped.apply(lambda x: x.index[0]).values
+    second_fixation_selection = df_refixations_grouped.apply(lambda x: x.index[1]).values
+    print("------------df  fixation locations------------------")
+    print(df_fixation_durations)
+    df_first_fixation_exclusive = df_fixation_durations.loc[first_fixation_selection_exclusive,:]
+    df_second_fixation = df_fixation_durations.loc[second_fixation_selection,:]
 
-        return df_single_fixation, df_first_fixation['fixation duration'], df_second_fixation['fixation duration']
+    return df_single_fixation, df_first_fixation['fixation duration'], df_second_fixation['fixation duration']
 
 
 def make_FD_bygroup(df_alldata_no_regr,df_alldata,df_single_fixation,freqbins,predbins):
@@ -158,7 +158,7 @@ def make_word_measures_bylength(df_alldata):
 
     #df_only_word_activity_grpby_length = df_only_word_activity.groupby('word length').agg(np.mean)
 
-    for i in xrange(len(complete_threshold_matrix[0,:])):
+    for i in range(len(complete_threshold_matrix[0,:])):
         complete_threshold_matrix[:,i] = complete_threshold_matrix[:,0]
     df_only_word_threshold = pd.DataFrame(complete_threshold_matrix, dtype=float)
     df_only_word_threshold = pd.concat([df_only_word_threshold, df_alldata['word length']], axis=1, join_axes=[df_only_word_threshold.index])

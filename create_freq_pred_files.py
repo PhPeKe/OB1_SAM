@@ -55,7 +55,7 @@ def create_freq_file(freqlist_arrays, freqthreshold, nr_highfreqwords):
         file_freq_dict[unicode(word.lower())] = frequency_words_dict[word]
 
     ## Put top freq words in dict, can use np.shape(array)[0]):
-    for line_number in xrange(nr_highfreqwords):
+    for line_number in range(nr_highfreqwords):
         file_freq_dict[unicode((freq_words[line_number][0]).lower())] = freq_words[line_number][1]
 
     output_file_frequency_map = "Data\PSCall_frequency_map.dat"
@@ -68,7 +68,7 @@ def create_pred_file():
 
     output_file_predictions_map = "Data\PSCall_predictions_map.dat"
     with open (output_file_predictions_map,"w") as f:
-	    pickle.dump(file_pred_dict,f)
+        pickle.dump(file_pred_dict,f)
 
 create_freq_file(freqlist_arrays,freqthreshold,nr_highfreqwords)
 create_pred_file()

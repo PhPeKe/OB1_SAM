@@ -63,7 +63,7 @@ def select_condition_words(df_psc,length_selection,max_freq_diff,max_pred):
     index_list = []
     for name,wl_group in df_psc.groupby('word length'):
         if name in length_selection:
-            for i in xrange(0,len(wl_group.index)-2):
+            for i in range(0,len(wl_group.index)-2):
                 if (wl_group.index[i]+1 == wl_group.index[i+1]) and abs(wl_group.loc[wl_group.index[i],:]['freq'] - wl_group.loc[wl_group.index[i+1],:]['freq']) < max_freq_diff:
                     if  wl_group.loc[wl_group.index[i+1],:]['pred'] < max_pred:
                         index_list.append(wl_group.index[i])
@@ -95,7 +95,7 @@ def add_control_words(df_psc,df_psc_selection,length_selection,max_freq_diff):
     for word_length in length_selection:
         df_psc_selection_wl = df_psc_selection[df_psc_selection['word length']==word_length]
         df_psc_wl = df_psc[df_psc['word length']==word_length]
-        for i in xrange(len(df_psc_selection_wl['freq'])):
+        for i in range(len(df_psc_selection_wl['freq'])):
             freqstart = df_psc_selection_wl.iloc[i]['freq'] - max_freq_diff
             freqend = df_psc_selection_wl.iloc[i]['freq'] + max_freq_diff
             #(df_psc_wl['freq'] - df_psc_selection_wl.iloc[i]['freq']).abs().argsort()[:10]

@@ -29,7 +29,7 @@ from get_parameters import get_params
 from joblib import Parallel, delayed
 
 import random
-from deap import creator, base, tools
+from deap import creator, base, tools, algorithms
 from scoop import futures
 
 # Init distance variables for the reading function used in tuning
@@ -77,7 +77,7 @@ def main():
 #			f.write(p)
 #			f.write("\n")
 	        N_RUNS += 1
-#	        return distance
+	        return (distance,)
 
 	if pm.language == "german":
 		filename = "PSC_ALL"
@@ -107,7 +107,7 @@ def main():
 
 	if pm.optimize:
 		# EA parameters
-		pop_size = 32
+		pop_size = 2
 		multi_processing = True
 		gens = 10
 		tournament_size = 5
@@ -147,7 +147,7 @@ def main():
 					mutated_gen.append(allele)
 			# Sanity check that mutation went right
 			assert(len(mutated_gen) == len(gen))
-			return mutated_gen
+			return mutated_gen,
 
 
 		toolbox = base.Toolbox()
@@ -192,7 +192,7 @@ def main():
 		save=""
 		for ind, fit in zip(population, fits):
 			ind.fitness.values = fit
-			save += "0 " + fit + "\n"
+			save += "0 " + str(fit[0]) + "\n"
 		with open("result_EA.txt","a") as f:
 			f.write(save)
 		np.savetxt("gen_0.txt", population)
@@ -201,7 +201,7 @@ def main():
 		for gen in range(gens):
 			# Select fittest individuals
 			offspring = map(toolbox.clone, toolbox.select(population, pop_size-1))
-			elite = tools.selBest(population, n=1)
+			elite = tools.selBest(population, k=1)
 			offspring += elite
 			# Apply crossover and mutation
 			offspring = algorithms.varAnd(offspring, toolbox, cx_prob, mut_prob)

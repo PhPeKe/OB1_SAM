@@ -210,6 +210,7 @@ def get_scores(input_text_filename,all_data,unrecognized_words):
     suptitle = plt.suptitle("SSE: "+str(round(sse, 4)), y=1.02)
     fig.tight_layout()
     plt.savefig("test_density"+str(int(t))+".png", bbox_extra_artists=(suptitle, ), bbox_inches="tight", dpi=300)
+    plt.close()
     if pm.tuning_measure == "KL":
         if not any(pm.objective):
             return total_divergence

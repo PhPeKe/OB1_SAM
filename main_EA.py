@@ -27,6 +27,7 @@ import parameters as pm
 import pandas as pd
 from get_parameters import get_params
 from joblib import Parallel, delayed
+from copy import copy
 
 import random
 from deap import creator, base, tools, algorithms
@@ -107,14 +108,14 @@ def main():
 
 	if pm.optimize:
 		# EA parameters
-		pop_size = 2
+		pop_size = 32
 		multi_processing = True
 		gens = 10
 		tournament_size = 5
-		cx_prob = 0.6
+		cx_prob = 0.2
 		# Mutation = +-10%
 		mut_size = 0.1
-		mut_prob = 0.2
+		mut_prob = 0.1
 
 		# Create fitness
 		creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -123,7 +124,8 @@ def main():
 		creator.create("Individual", list, fitness=creator.FitnessMin)
 
 		# Register attributes with bounds
-		# TODO: discrete initialization 50% low 100% high
+		# TODO: evenly spread parameters (with for loop or similar), !!itertools combination!!
+		# use 3 points
 		def get_param(param):
 			init = random.randint(0,2)
 			if init == 0:
@@ -134,20 +136,16 @@ def main():
 				return param * 2.0
 
 		def mutate(gen, p):
-			mutated_gen = []
-			for allele in gen:
+			print("-----------------------\nGene before\n"+str(gen))
+			for i, allele in enumerate(gen):
 				# Mutation takes place
 				if random.uniform(0,1) > p:
-					print("Mutation of gene"+str(allele))
+					print("Mutation of gene "+str(gen[i]))
 					# Either + or - 10% of the original value
-					mutated_gen.append(allele + (allele * mut_size) if random.randint(0,1) else allele - (allele * mut_size))
-				# No mutation takes place
-				else:
-					# Append original value
-					mutated_gen.append(allele)
-			# Sanity check that mutation went right
-			assert(len(mutated_gen) == len(gen))
-			return mutated_gen,
+					gen[i] = allele + (allele * mut_size) if random.randint(0,1) else allele - (allele * mut_size)
+					print("to: "+str(gen[i]))
+			print("Gene after\n"+str(gen)+"\n-----------------------")
+			return (gen,)
 
 
 		toolbox = base.Toolbox()
@@ -177,16 +175,18 @@ def main():
 
 		# Define operators
 		toolbox.register("mate", tools.cxOnePoint)
-		toolbox.register("mutate", mutate, p=0.1)
+		toolbox.register("mutate", mutate, p=mut_prob)
 		toolbox.register("select", tools.selTournament, tournsize=tournament_size)
 		toolbox.register("evaluate", reading_function)
 
 		# Initialize first population
 		population = toolbox.population(n=pop_size)
 
+
 		# Evaluate first population
 		print("Start evaluation gen 0")
-		fits = Parallel(n_jobs=14, prefer="threads")(delayed(toolbox.evaluate)(ind) for ind in population)
+#		fits = Parallel(n_jobs=16, prefer="threads")(delayed(toolbox.evaluate)(ind) for ind in population)
+		fits = [toolbox.evaluate(ind) for ind in population]
 		print("Finished evaluation")
 		#toolbox.map(toolbox.evaluate, population)
 		save=""
@@ -196,7 +196,6 @@ def main():
 		with open("result_EA.txt","a") as f:
 			f.write(save)
 		np.savetxt("gen_0.txt", population)
-
 		# Main evolution loop
 		for gen in range(gens):
 			# Select fittest individuals
@@ -205,16 +204,17 @@ def main():
 			offspring += elite
 			# Apply crossover and mutation
 			offspring = algorithms.varAnd(offspring, toolbox, cx_prob, mut_prob)
-			population[:] = offspring
 			# Evaluate individuals
 			print("Starting evaluation "+str(gen+1))
-			fits = Parallel(n_jobs=14, prefer="threads")(delayed(toolbox.evaluate)(ind) for ind in population)
+#			fits = Parallel(n_jobs=16, prefer="threads")(delayed(toolbox.evaluate)(ind) for ind in offspring)
+			fits = [toolbox.evaluate(ind) for ind in offspring]
 			print("Finished evaluation")
 			# toolbox.map(toolbox.evaluate, population)
 			save=""
-			for ind, fit in zip(population, fits):
+			for ind, fit in zip(offspring, fits):
 				ind.fitness.values = fit
-				save += str(gen+1) + " " + str(fit) + "\n"
+				save += str(gen+1) + " " + str(fit[0]) + "\n"
+			population[:] = offspring
 			with open("result_EA.txt","a") as f:
 				f.write(save)
 			np.savetxt("gen_"+str(gen+1)+".txt", population)

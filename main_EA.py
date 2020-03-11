@@ -28,10 +28,10 @@ import pandas as pd
 from get_parameters import get_params
 from joblib import Parallel, delayed
 from copy import copy
+import itertools
 
 import random
 from deap import creator, base, tools, algorithms
-from scoop import futures
 
 # Init distance variables for the reading function used in tuning
 OLD_DISTANCE = np.inf
@@ -54,31 +54,31 @@ def main():
 	#	with open("Results/unrecognized.pkl","r") as f:
 	#		unrecognized_words = pickle.load(f)
 	###
-	        # Run the simulation
-	        (lexicon, all_data, unrecognized_words) = reading_simulation(filepath_psc, parameters_rf)
-	        # Evaluate run and retrieve error-metric
-	        distance = get_scores(filename, all_data, unrecognized_words)
+			# Run the simulation
+		(lexicon, all_data, unrecognized_words) = reading_simulation(filepath_psc, parameters_rf)
+		# Evaluate run and retrieve error-metric
+		distance = get_scores(filename, all_data, unrecognized_words)
 
-	        # Save parameters when distance is better than previous
-	        write_out = pd.DataFrame(np.array([names, parameters_rf]).T)
-#	        if distance < OLD_DISTANCE:
-#	                write_out.to_csv(str(distance)+"_"+pm.tuning_measure+"parameters.txt", index=False, header=["name", "value"])
-#	                OLD_DISTANCE = distance
+		# Save parameters when distance is better than previous
+		write_out = pd.DataFrame(np.array([names, parameters_rf]).T)
+	#	        if distance < OLD_DISTANCE:
+	#	                write_out.to_csv(str(distance)+"_"+pm.tuning_measure+"parameters.txt", index=False, header=["name", "value"])
+	#	                OLD_DISTANCE = distance
 
-#		p = ""
+	#		p = ""
 
-#		for param, name in zip(parameters_rf, names):
-#			p += name +": "
-#			p += str(param)
-#			p += "\n"
-#
-#	        # Save distances for plotting convergence
-#	        with open("dist.txt", "a") as f:
-#	                f.write("run "+str(N_RUNS)+": "+str(int(distance))+"\n")
-#			f.write(p)
-#			f.write("\n")
-	        N_RUNS += 1
-	        return (distance,)
+	#		for param, name in zip(parameters_rf, names):
+	#			p += name +": "
+	#			p += str(param)
+	#			p += "\n"
+	#
+	#	        # Save distances for plotting convergence
+	#	        with open("dist.txt", "a") as f:
+	#	                f.write("run "+str(N_RUNS)+": "+str(int(distance))+"\n")
+	#			f.write(p)
+	#			f.write("\n")
+		N_RUNS += 1
+		return (distance,)
 
 	if pm.language == "german":
 		filename = "PSC_ALL"
@@ -108,9 +108,9 @@ def main():
 
 	if pm.optimize:
 		# EA parameters
-		pop_size = 32
+		pop_size = 243
 		multi_processing = True
-		gens = 10
+		gens = 7
 		tournament_size = 5
 		cx_prob = 0.2
 		# Mutation = +-10%
@@ -123,17 +123,14 @@ def main():
 		# Create Individual
 		creator.create("Individual", list, fitness=creator.FitnessMin)
 
-		# Register attributes with bounds
-		# TODO: evenly spread parameters (with for loop or similar), !!itertools combination!!
-		# use 3 points
-		def get_param(param):
-			init = random.randint(0,2)
-			if init == 0:
-				return param - (param/2.0)
-			if init == 1:
-				return param
-			if init == 2:
-				return param * 2.0
+		def high(x):
+			return x*2
+
+		def low(x):
+			return x/2
+
+		def same(x):
+			return x
 
 		def mutate(gen, p):
 			print("-----------------------\nGene before\n"+str(gen))
@@ -142,36 +139,27 @@ def main():
 				if random.uniform(0,1) > p:
 					print("Mutation of gene "+str(gen[i]))
 					# Either + or - 10% of the original value
-					gen[i] = allele + (allele * mut_size) if random.randint(0,1) else allele - (allele * mut_size)
+					gen[i] = allele + (allele * mut_size) if random.randint(0, 1) else allele - (allele * mut_size)
 					print("to: "+str(gen[i]))
 			print("Gene after\n"+str(gen)+"\n-----------------------")
-			return (gen,)
+			return gen,
 
+		def initIndividual(icls, content):
+			return icls(content)
+
+		def initPopulation(pcls, ind_init):
+			n_params = 5
+			combinaties = [list(x) for x in list(itertools.product([same, high, low], repeat=n_params))]
+			start_params = [4.0, 1.29, 7.0, 4.9, 2.2]
+			contents = [[y(z) for y, z in zip(x, start_params)] for x in combinaties]
+			return pcls(ind_init(c) for c in contents)
 
 		toolbox = base.Toolbox()
-		toolbox.register("attention_skew", get_param, 4.0)
-		toolbox.register("salience_position", get_param, 1.29)
-		toolbox.register("sacc_optimal_distance", get_param, 7.0)
-		toolbox.register("mu", get_param, 4.9)
-		toolbox.register("sigma", get_param, 2.2)
-		toolbox.register("distribution_param", get_param, 1.1)
 
-		# Register Individual
-		toolbox.register("Individual", tools.initCycle, creator.Individual,
-				(toolbox.attention_skew,
-				 toolbox.salience_position,
-				 toolbox.sacc_optimal_distance,
-				 toolbox.mu,
-				 toolbox.sigma,
-				 toolbox.distribution_param),
-				n=1)
+		toolbox.register("individual_guess", initIndividual, creator.Individual)
+		toolbox.register("population_guess", initPopulation, list, toolbox.individual_guess)
 
-		# Register population
-		toolbox.register("population", tools.initRepeat, list, toolbox.Individual)
-
-		# Enable parallel processing
-#		if multi_processing:
-#			toolbox.register("map", futures.map)
+		population = toolbox.population_guess()
 
 		# Define operators
 		toolbox.register("mate", tools.cxOnePoint)
@@ -179,14 +167,11 @@ def main():
 		toolbox.register("select", tools.selTournament, tournsize=tournament_size)
 		toolbox.register("evaluate", reading_function)
 
-		# Initialize first population
-		population = toolbox.population(n=pop_size)
-
 
 		# Evaluate first population
 		print("Start evaluation gen 0")
-#		fits = Parallel(n_jobs=16, prefer="threads")(delayed(toolbox.evaluate)(ind) for ind in population)
-		fits = [toolbox.evaluate(ind) for ind in population]
+		fits = Parallel(n_jobs=8)(delayed(toolbox.evaluate)(ind) for ind in population)
+#		fits = [toolbox.evaluate(ind) for ind in population]
 		print("Finished evaluation")
 		#toolbox.map(toolbox.evaluate, population)
 		save=""
@@ -199,15 +184,16 @@ def main():
 		# Main evolution loop
 		for gen in range(gens):
 			# Select fittest individuals
-			offspring = map(toolbox.clone, toolbox.select(population, pop_size-1))
+			pop_size /= 2
+			offspring = map(toolbox.clone, toolbox.select(population, pop_size))
 			elite = tools.selBest(population, k=1)
 			offspring += elite
 			# Apply crossover and mutation
 			offspring = algorithms.varAnd(offspring, toolbox, cx_prob, mut_prob)
 			# Evaluate individuals
 			print("Starting evaluation "+str(gen+1))
-#			fits = Parallel(n_jobs=16, prefer="threads")(delayed(toolbox.evaluate)(ind) for ind in offspring)
-			fits = [toolbox.evaluate(ind) for ind in offspring]
+			fits = Parallel(n_jobs=8)(delayed(toolbox.evaluate)(ind) for ind in offspring)
+#			fits = [toolbox.evaluate(ind) for ind in offspring]
 			print("Finished evaluation")
 			# toolbox.map(toolbox.evaluate, population)
 			save=""

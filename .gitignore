@@ -1,11 +1,4 @@
-*.png
-*.pyc
-*.pkl
-*.txt
-*.xlsx
-*.dat
 hal.py
-*.sh
 .idea/
 Results
 a
@@ -15,3 +8,8 @@ make_validation*
 test_lagsuccessor*
 speed_test*
 *lation_cycle.py
+!*.py
+plots*
+Data*
+__pycache*
+*.pkl

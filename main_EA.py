@@ -36,7 +36,7 @@ from deap import creator, base, tools, algorithms
 # Init distance variables for the reading function used in tuning
 OLD_DISTANCE = np.inf
 N_RUNS = 0
-
+fname = "gen_1.txt"  # File name specifying the location of the last saved generation from which should be started, if empty evaluation starts from beginning
 
 def main():
 	# Get parameters for tuning
@@ -55,12 +55,17 @@ def main():
 	#		unrecognized_words = pickle.load(f)
 	###
 			# Run the simulation
-		(lexicon, all_data, unrecognized_words) = reading_simulation(filepath_psc, parameters_rf)
-		# Evaluate run and retrieve error-metric
-		distance = get_scores(filename, all_data, unrecognized_words)
-
+		try:
+			(lexicon, all_data, unrecognized_words) = reading_simulation(filepath_psc, parameters_rf)
+			# Evaluate run and retrieve error-metric
+			distance = get_scores(filename, all_data, unrecognized_words)
+		except:
+			print("Reading function error: returning distance=99999999")
+			distance = 99999999.0
+			N_RUNS += 1
+			return (distance,)
 		# Save parameters when distance is better than previous
-		write_out = pd.DataFrame(np.array([names, parameters_rf]).T)
+#		write_out = pd.DataFrame(np.array([names, parameters_rf]).T)
 	#	        if distance < OLD_DISTANCE:
 	#	                write_out.to_csv(str(distance)+"_"+pm.tuning_measure+"parameters.txt", index=False, header=["name", "value"])
 	#	                OLD_DISTANCE = distance
@@ -154,12 +159,24 @@ def main():
 			contents = [[y(z) for y, z in zip(x, start_params)] for x in combinaties]
 			return pcls(ind_init(c) for c in contents)
 
+		def load_pop(pcls, ind_init):
+			global fname
+			print("Loading: "+str(fname))
+			contents = np.loadtxt(fname)
+			return pcls(ind_init(c) for c in contents)
+
 		toolbox = base.Toolbox()
 
 		toolbox.register("individual_guess", initIndividual, creator.Individual)
-		toolbox.register("population_guess", initPopulation, list, toolbox.individual_guess)
+		if not fname:
+			toolbox.register("population_guess", initPopulation, list, toolbox.individual_guess)
+		else:
+			print("STARTING FROM "+str(fname)+" AS STARTING POPULATION")
+			toolbox.register("population_guess", load_pop, list, toolbox.individual_guess)
 
 		population = toolbox.population_guess()
+
+		print(population)
 
 		# Define operators
 		toolbox.register("mate", tools.cxOnePoint)
@@ -167,33 +184,50 @@ def main():
 		toolbox.register("select", tools.selTournament, tournsize=tournament_size)
 		toolbox.register("evaluate", reading_function)
 
-
-		# Evaluate first population
-		print("Start evaluation gen 0")
-		fits = Parallel(n_jobs=8)(delayed(toolbox.evaluate)(ind) for ind in population)
-#		fits = [toolbox.evaluate(ind) for ind in population]
-		print("Finished evaluation")
-		#toolbox.map(toolbox.evaluate, population)
-		save=""
-		for ind, fit in zip(population, fits):
-			ind.fitness.values = fit
-			save += "0 " + str(fit[0]) + "\n"
-		with open("result_EA.txt","a") as f:
-			f.write(save)
-		np.savetxt("gen_0.txt", population)
+		if not fname:
+			# Evaluate first population
+			print("Start evaluation gen 0")
+#			fits = Parallel(n_jobs=8)(delayed(toolbox.evaluate)(ind) for ind in population)
+			fits = [toolbox.evaluate(ind) for ind in population]
+			print("Finished evaluation")
+			#toolbox.map(toolbox.evaluate, population)
+			save=""
+			for ind, fit in zip(population, fits):
+				ind.fitness.values = fit
+				save += "0 " + str(fit[0]) + "\n"
+			with open("result_EA.txt","a") as f:
+				f.write(save)
+			np.savetxt("gen_0.txt", population)
+		else:
+			start_gen = int(fname.split("_")[1].split(".")[0])
+			print("Starting from generation "+str(start_gen))
 		# Main evolution loop
 		for gen in range(gens):
-			# Select fittest individuals
 			pop_size /= 2
+			print("Gen:"+str(gen+1))
+			print("Pop-size:"+str(pop_size))
+			# If generation is restarted we skip past generations and load the fitness from the output-file
+			if gen+1 < start_gen:
+				continue
+			if gen+1 == start_gen:
+				with open("result_EA.txt","r") as f:
+					print("Reading fitness fom file...")
+					fits = [float(x.replace("\n","").split(" ")[1]) for x in f.readlines() if str(start_gen) in x]
+				pop_size = len(fits) / 2
+				print("Updated pop_size to: "+str(pop_size))
+				for ind, fit in zip(population, fits):
+					print("Reinitializing:\n"+str(ind)+"\nwith fitness\n"+str(fit))
+					ind.fitness.value = fit
+			# Select fittest individuals
 			offspring = map(toolbox.clone, toolbox.select(population, pop_size))
 			elite = tools.selBest(population, k=1)
-			offspring += elite
 			# Apply crossover and mutation
 			offspring = algorithms.varAnd(offspring, toolbox, cx_prob, mut_prob)
+			offspring += elite
 			# Evaluate individuals
 			print("Starting evaluation "+str(gen+1))
-			fits = Parallel(n_jobs=8)(delayed(toolbox.evaluate)(ind) for ind in offspring)
-#			fits = [toolbox.evaluate(ind) for ind in offspring]
+#			fits = Parallel(n_jobs=8)(delayed(toolbox.evaluate)(ind) for ind in offspring)
+			fits = [toolbox.evaluate(ind) for ind in offspring]
 			print("Finished evaluation")
 			# toolbox.map(toolbox.evaluate, population)
 			save=""

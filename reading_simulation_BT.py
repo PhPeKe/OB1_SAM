@@ -100,7 +100,7 @@ def reading_simulation_BT(filename):
     #---------------------------------------------------------------------------
     ## Make lexicon. Makes sure lexicon contains no double words.
 
-    for i in range(len(individual_words)):
+    for i in xrange(len(individual_words)):
         if individual_words[i] not in lexicon:
             lexicon.append(individual_words[i])
 
@@ -156,7 +156,7 @@ def reading_simulation_BT(filename):
         individual_to_lexicon_indices[i] = lexicon.index(word)
 
     ## lexicon bigram dict
-    for word in range(LEXICON_SIZE):
+    for word in xrange(LEXICON_SIZE):
         lexicon[word] = " "+lexicon[word]+" "
         [all_word_ngrams, bigramLocations] = stringToBigramsAndLocations(" "+lexicon[word]+" ")
         all_word_bigrams = []
@@ -167,12 +167,12 @@ def reading_simulation_BT(filename):
         lexicon[word] = lexicon[word][1:(len(lexicon[word])-1)]
         lexicon_word_bigrams[lexicon[word]] = all_word_bigrams
 
-    print("Amount of words in lexicon: ",LEXICON_SIZE)
-    print("Amount of words in text:",TOTAL_WORDS)
-    print("")
+    print "Amount of words in lexicon: ",LEXICON_SIZE
+    print "Amount of words in text:",TOTAL_WORDS
+    print ""
 
 #-----------------------------------------------------------------------------------------
-    print("Setting up word-to-word inhibition grid...")
+    print "Setting up word-to-word inhibition grid..."
     # Set up the list of word inhibition pairs, with amount of bigram/monograms overlaps for every pair.
 
     #initialize inhibition matrix with false
@@ -180,15 +180,15 @@ def reading_simulation_BT(filename):
 
     complete_selective_word_inhibition = True
     overlap_list = {}
-    for other_word in range(LEXICON_SIZE):
-        for word in range(LEXICON_SIZE):
+    for other_word in xrange(LEXICON_SIZE):
+        for word in xrange(LEXICON_SIZE):
             if lexicon[word]==lexicon[other_word]:
                 continue
             else:
                 bigrams_common = []
                 bigrams_append = bigrams_common.append
                 bigram_overlap_counter = 0
-                for bigram in range(len(lexicon_word_bigrams[lexicon[word]])):
+                for bigram in xrange(len(lexicon_word_bigrams[lexicon[word]])):
                     if lexicon_word_bigrams[lexicon[word]][bigram] in lexicon_word_bigrams[lexicon[other_word]]:
                         bigrams_append(lexicon_word_bigrams[lexicon[word]][bigram])
                         lexicon_word_bigrams_set[lexicon[word]] = set(lexicon_word_bigrams[lexicon[word]])
@@ -199,7 +199,7 @@ def reading_simulation_BT(filename):
                 monogram_overlap_counter = 0
 
                 unique_word_letters = ''.join(set(lexicon[word]))
-                for pos in range(len(unique_word_letters)):
+                for pos in xrange(len(unique_word_letters)):
                     monogram = unique_word_letters[pos]
                     if monogram in lexicon[other_word]:
                         monograms_append(monogram)
@@ -260,12 +260,12 @@ def reading_simulation_BT(filename):
         pickle.dump(df_individual_words, f2)
 
 
-    print("Inhibition grid ready.")
-    print("")
+    print "Inhibition grid ready."
+    print ""
   #---------------------------------------------------------------------------
-    print("BEGIN READING")
-    print("")
-    print("")
+    print "BEGIN READING"
+    print ""
+    print ""
 
     ## Initialize Parameters
     total_reading_time = 0
@@ -432,23 +432,23 @@ def reading_simulation_BT(filename):
             if not regression and word == individual_to_lexicon_indices[fixation]:
                 N_in_allocated += 1
                 if do_boundary_task and stimulus_position == 3:
-                    print(stimulus)
-                    print(fixation, individual_words[fixation])
-                    print("N",df_boundary_task.loc[fixation,'words'],df_boundary_task.loc[fixation,'control words'], word)
+                    print stimulus
+                    print fixation, individual_words[fixation]
+                    print "N",df_boundary_task.loc[fixation,'words'],df_boundary_task.loc[fixation,'control words'], word
                     to_pauze = True
 
             if not regression and (fixation+1 <= len(individual_words)-1) and (word == individual_to_lexicon_indices[fixation+1]):
                 N1_in_allocated += 1
                 if do_boundary_task and stimulus_position == 3:
-                    print(stimulus, stimulus_BT)
-                    print(fixation, individual_words[fixation+1], stimulus)
-                    print("N+1",df_boundary_task.loc[fixation,'words'],df_boundary_task.loc[fixation,'control words'], word)
+                    print stimulus, stimulus_BT
+                    print fixation, individual_words[fixation+1], stimulus
+                    print "N+1",df_boundary_task.loc[fixation,'words'],df_boundary_task.loc[fixation,'control words'], word
                     to_pauze = True
         print
 
         ## To find the words that are wrongly allocated
         if pm.pauze_allocation_errors and to_pauze:
-            print("PAUSE, type anything to continue")
+            print "PAUSE, type anything to continue"
             #print df_boundary_task.loc[fixation,'recognized words']
             response  = raw_input()
             to_pauze=False
@@ -514,7 +514,7 @@ def reading_simulation_BT(filename):
         allMonograms_set, allBigrams_set = set(allMonograms),set(allBigrams)
 
         if do_boundary_task:
-            print(stimulus_BT, stimulus, allMonograms)
+            print stimulus_BT, stimulus, allMonograms
 
 
     #-------------------------------------------------------------------------------
@@ -543,14 +543,14 @@ def reading_simulation_BT(filename):
 
         #identify the beginning and end of fixation word by looking at the first letter following a space, counted to the left of the center,
         #and the first letter followed by a space, counted to the right from the center
-        for letter_index in range(int(fixationCenter),len(stimulus)):
+        for letter_index in xrange(int(fixationCenter),len(stimulus)):
             if stimulus[letter_index]==" ":
                 centerWordLastLetterIndex = letter_index-1
                 if (centerWordLastLetterIndex == len(stimulus)-1):
                     assert(fixation==TOTAL_WORDS-1) #can only happen for last word
                 break
 
-        for letter_index_reversed in range(int(fixationCenter),-1,-1):
+        for letter_index_reversed in xrange(int(fixationCenter),-1,-1):
             if stimulus[letter_index_reversed]==" ":
                 centerWordFirstLetterIndex = letter_index_reversed+1
                 break
@@ -760,7 +760,7 @@ def reading_simulation_BT(filename):
             # Here, we check whether a shift will be made after the current cycle.
             # This can be due to the total activity threshold, or the recognition threshold.
             total_activity = 0
-            for word in range(len(stimulus.split(" "))-2):
+            for word in xrange(len(stimulus.split(" "))-2):
                 total_activity += lexicon_word_activity_np[lexicon_index_dict[stimulus.split(" ")[word+1]]]
 
             crt_fixation_word_activities[3]=lexicon_word_activity_np[lexicon_index_dict[individual_words[fixation]]]
@@ -900,9 +900,9 @@ def reading_simulation_BT(filename):
 
                     # Check whether the previous word was recognized or there was already a regression performed. If not: regress.
                     elif fixation>1 and recognized_position_flag[fixation-1] == False and regression_flag[fixation-1]==False:
-                        AttentionPosition = getMidwordPositionForSurroundingWord(-1,rightWordEdgeLetterIndexes,leftWordEdgeLetterIndexes)
-                        OffsetFromWordCenter=0
-                        regression = True
+                            AttentionPosition = getMidwordPositionForSurroundingWord(-1,rightWordEdgeLetterIndexes,leftWordEdgeLetterIndexes)
+                            OffsetFromWordCenter=0
+                            regression = True
 
                     #elif (not recognized_position_flag[fixation]) and (lexicon_word_activity[individual_words[fixation]]>0):
                     elif (not recognized_position_flag[fixation]) and (lexicon_word_activity_np[lexicon_index_dict[individual_words[fixation]]]>0):
@@ -913,7 +913,7 @@ def reading_simulation_BT(filename):
                         #TODO error in word_reminder_length, ->solved using +1 in refixsize?
                         word_reminder_length = rightWordEdgeLetterIndexes[0][1]-(rightWordEdgeLetterIndexes[0][0])
                         if(word_reminder_length>0):
-                        #Use first refixation middle of remaining half as refixation stepsize
+                            #Use first refixation middle of remaining half as refixation stepsize
                             if all_data[fixation_counter-1]['refixated'] !=True:
                                 refixsize = round((word_reminder_length)*pm.refix_size)
                                 AttentionPosition = fixationFirstPositionRightToMiddle + refixsize
@@ -1134,13 +1134,13 @@ def reading_simulation_BT(filename):
     # append unrecognized words to the list
     unrecognized_words = []
     unrecognized_words_append = unrecognized_words.append
-    for position in range(TOTAL_WORDS):
+    for position in xrange(TOTAL_WORDS):
         if not recognized_word_at_position_flag[position]:
             unrecognized_words_append((individual_words[position],position))
     #-----------------------------------------------------------------------------------------------------
 
     # END OF READING. Return all_data and the list of unrecognized words.
-    print(N_in_allocated,N1_in_allocated)
+    print N_in_allocated,N1_in_allocated
     return (all_data, unrecognized_words)
 
 #---------------------------------------------------------------------------------

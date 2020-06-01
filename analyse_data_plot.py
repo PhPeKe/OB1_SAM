@@ -36,13 +36,13 @@ def analyse_fixdur_aroundwordskip(df_alldata,df_unrecognised_words):
         foveal_word_index_wordskipped = df_alldata.loc[i-1,:]['foveal word text index']+1
         recognized_word_positions_beforewordskip = df_alldata.loc[i-1,:]['exact recognized words positions']
         wordskip_recognized_before.append(foveal_word_index_wordskipped in recognized_word_positions_beforewordskip)
-    print("recognized before wordskip:",(np.sum(wordskip_recognized_before)/float(len(wordskip_recognized_before))),float(len(wordskip_recognized_before)))
+    print "recognized before wordskip:",(np.sum(wordskip_recognized_before)/float(len(wordskip_recognized_before))),float(len(wordskip_recognized_before))
     #print "% 2 letter words skipped: ",len(df_alldata[(df_alldata['word length']==2) & (df_alldata['wordskipped']==True)])/float(len(df_alldata[df_alldata['word length']==2]) )
     # Check if skipped words are eventually recognized
     wordskip_recognized_after = []
     for word_index in df_alldata[(df_alldata['wordskipped']==True)].loc[:,'foveal word text index']:
         wordskip_recognized_after.append(word_index in df_unrecognised_words.iloc[:,1].values)
-    print("recognized after wordskip:",1-np.sum(wordskip_recognized_after)/float(len(wordskip_recognized_after)))
+    print "recognized after wordskip:",1-np.sum(wordskip_recognized_after)/float(len(wordskip_recognized_after))
     #print df_alldata[df_alldata['word length']==2]['word frequency'].mean(), df_alldata[df_alldata['word length']==2]['word predictability'].mean()
 
 
@@ -50,8 +50,8 @@ def fastvsslow_words(df_single_fixation):
     ## Select the df_words with fast and slow fixation durations
     fast_words = df_single_fixation[df_single_fixation['fixation duration']<200]
     slow_words = df_single_fixation[df_single_fixation['fixation duration']>200]
-    print('Fast words (length,freq):',fast_words['word length'].mean(),fast_words['word frequency'].mean())
-    print('Slow words (length,freq):',slow_words['word length'].mean(),slow_words['word frequency'].mean())
+    print 'Fast words (length,freq):',fast_words['word length'].mean(),fast_words['word frequency'].mean()
+    print 'Slow words (length,freq):',slow_words['word length'].mean(),slow_words['word frequency'].mean()
 
 
 
@@ -115,7 +115,7 @@ def plot_by_relative_landing_pos(df_single_fixation, df_alldata_grouped_all,exp_
     plt.savefig("plots/plot_by_relative_landing_pos.png",dpi=300)
 
 def plot_recognized_cycles(df_alldata):
-    print(df_alldata['recognition cycle'].mean())
+    print df_alldata['recognition cycle'].mean()
     df_recognized = df_alldata[df_alldata['recognition cycle']>-1]
     df_grpby_recognized_cycle = df_recognized[['regressed','refixated','forward','wordskipped','recognition cycle']].groupby('recognition cycle').sum()
     fig = plt.figure('Recognized cycles')
@@ -205,7 +205,7 @@ def plot_attendwidth(df_alldata):
     attendwidthbins = np.arange(0,6.5,0.5)
     plt.title("Attentional width")
     df_alldata['attentional width'].hist(bins=attendwidthbins)
-    print("not 5 width skip", len(df_alldata[(df_alldata['attentional width'] != 5) & (df_alldata['after wordskip']==True)]))
+    print "not 5 width skip", len(df_alldata[(df_alldata['attentional width'] != 5) & (df_alldata['after wordskip']==True)])
     plt.savefig('plots/attentional_width', dpi=300)
 
 
@@ -281,8 +281,8 @@ def plot_offset(df_alldata,exp_landing_positions):
     exp_landing_positions.plot(kind = 'kde',color = 'g',bw_method=0.4)
     plt.xlim(-7,7)
     plt.legend(['Sim.','Exp.'])
-    print(df_alldata_firstpass['relative landing position'].mean(),exp_landing_positions.mean())
-    print("Refixated (Offset, saccade error):",df_alldata[df_alldata['refixated']==False]['Offset'].mean(), df_alldata[df_alldata['refixated']==False]['saccade error'].mean())
+    print df_alldata_firstpass['relative landing position'].mean(),exp_landing_positions.mean()
+    print "Refixated (Offset, saccade error):",df_alldata[df_alldata['refixated']==False]['Offset'].mean(), df_alldata[df_alldata['refixated']==False]['saccade error'].mean()
     plt.savefig("plots/offset.png",dpi=300)
 
 
@@ -322,8 +322,8 @@ def plot_saccerror_type(df_alldata):
     plt.figure('Saccade error by type')
     plt.title('Saccade type by error')
     df_alldata['saccade_type_by_error'].hist(bins=8)
-    _range = int(max(df_alldata['saccade_type_by_error'].unique()))
-    plt.xticks(range(_range+1),['No error','refixated','forward','after wordskip'], size='large', alpha=0.5, ha='center')
+    xrange = int(max(df_alldata['saccade_type_by_error'].unique()))
+    plt.xticks(range(xrange+1),['No error','refixated','forward','after wordskip'], size='large', alpha=0.5, ha='center')
     plt.savefig('plots/saccade_type_by_error.png', dpi=300)
 
 
@@ -364,9 +364,9 @@ def plot_sacctypeprob_bygroup(df_alldata_grouped_all,exp_sacctype_grpby_prob_dic
     # funcdict = {'columnname':function}
     # df_sacctypes1 =  df_alldata_grouped[['regressed','refixated','wordskipped']].agg(maketrue)
     df_sacctypes = df_alldata_grouped_all.loc[:,['regressed','refixated','wordskipped','word length','pred','freq']]
-    print("wordskip==regressed:", len(df_sacctypes[(df_sacctypes['regressed']==True) & (df_sacctypes['wordskipped']==True)]))
-    print("wordskip<regressed:",len(df_sacctypes[(df_sacctypes['regressed']==True) & (df_sacctypes['wordskipped']==False)]))
-    print("wordskip>regressed:",len(df_sacctypes[(df_sacctypes['regressed']==False) & (df_sacctypes['wordskipped']==True)]))
+    print "wordskip==regressed:", len(df_sacctypes[(df_sacctypes['regressed']==True) & (df_sacctypes['wordskipped']==True)])
+    print "wordskip<regressed:",len(df_sacctypes[(df_sacctypes['regressed']==True) & (df_sacctypes['wordskipped']==False)])
+    print "wordskip>regressed:",len(df_sacctypes[(df_sacctypes['regressed']==False) & (df_sacctypes['wordskipped']==True)])
     df_sacctypes_grpby_length = df_sacctypes.drop(['freq','pred'],1).groupby(['word length']).sum()
     groupsizes_length = df_sacctypes.drop(['freq','pred'],1).groupby(['word length']).size()
     word_freq_groups_sacc = pd.cut(df_sacctypes['freq'], freqbins)
@@ -375,7 +375,7 @@ def plot_sacctypeprob_bygroup(df_alldata_grouped_all,exp_sacctype_grpby_prob_dic
     word_pred_groups_sacc = pd.cut(df_sacctypes['pred'], predbins)
     df_sacctypes_grpby_pred = df_sacctypes.drop(['word length','freq','pred'],1).groupby(word_pred_groups_sacc).sum()
     groupsizes_pred = df_sacctypes.drop(['word length','freq','pred'],1).groupby(word_pred_groups_sacc).size()
-    print(groupsizes_length)
+    print groupsizes_length
 
     fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(15,5),sharey=True)
     fig.canvas.set_window_title('Grouped saccade type prob')
@@ -408,9 +408,9 @@ def sse_sacctypeprob_bygroup(df_alldata_grouped_all,exp_sacctype_grpby_prob_dict
     # funcdict = {'columnname':function}
     # df_sacctypes1 =  df_alldata_grouped[['regressed','refixated','wordskipped']].agg(maketrue)
     df_sacctypes = df_alldata_grouped_all.loc[:,['regressed','refixated','wordskipped','word length','pred','freq']]
-    print("wordskip==regressed:", len(df_sacctypes[(df_sacctypes['regressed']==True) & (df_sacctypes['wordskipped']==True)]))
-    print("wordskip<regressed:",len(df_sacctypes[(df_sacctypes['regressed']==True) & (df_sacctypes['wordskipped']==False)]))
-    print("wordskip>regressed:",len(df_sacctypes[(df_sacctypes['regressed']==False) & (df_sacctypes['wordskipped']==True)]))
+    print "wordskip==regressed:", len(df_sacctypes[(df_sacctypes['regressed']==True) & (df_sacctypes['wordskipped']==True)])
+    print "wordskip<regressed:",len(df_sacctypes[(df_sacctypes['regressed']==True) & (df_sacctypes['wordskipped']==False)])
+    print "wordskip>regressed:",len(df_sacctypes[(df_sacctypes['regressed']==False) & (df_sacctypes['wordskipped']==True)])
     df_sacctypes_grpby_length = df_sacctypes.drop(['freq','pred'],1).groupby(['word length']).sum()
     groupsizes_length = df_sacctypes.drop(['freq','pred'],1).groupby(['word length']).size()
     word_freq_groups_sacc = pd.cut(df_sacctypes['freq'], freqbins)
@@ -419,7 +419,7 @@ def sse_sacctypeprob_bygroup(df_alldata_grouped_all,exp_sacctype_grpby_prob_dict
     word_pred_groups_sacc = pd.cut(df_sacctypes['pred'], predbins)
     df_sacctypes_grpby_pred = df_sacctypes.drop(['word length','freq','pred'],1).groupby(word_pred_groups_sacc).sum()
     groupsizes_pred = df_sacctypes.drop(['word length','freq','pred'],1).groupby(word_pred_groups_sacc).size()
-    print(groupsizes_length)
+    print groupsizes_length
 
     df_sacctypes_grpby_length_prob = df_sacctypes_grpby_length.div(groupsizes_length, axis=0)
     df_sacctypes_grpby_freq_prob = df_sacctypes_grpby_freq.div(groupsizes_freq, axis=0)
@@ -547,7 +547,7 @@ def plot_lagsuccessor(df_alldata_no_regr,df_single_fixation,freqbins,predbins,di
         axes[1,1].set_xticks([0,1,2])
         axes[1,1].set_xlabel('Predictability')
         axes[1,1].set_xticklabels(['Low','Med','High'])
-
+        
     elif SF_OR_GD == "SF":
         fixdur_measure = "single fixation duration"
         plt.setp(axes, ylim=(190,240))
@@ -708,8 +708,8 @@ def plot_FD_hists(total_viewing_time,gaze_durations,df_single_fixations,first_fi
     ax.set_xlim([0, 500])
     gaze_durations['fixation duration'].plot(alpha=0.5, kind = 'density',sharex=False, bw_method=band_width)
     exp_FD_dict['GZD'].plot(alpha=0.5, kind = 'density',color = 'g',sharex=False, bw_method=band_width)
-    print(gaze_durations['fixation duration'].describe())
-    print(exp_FD_dict['GZD'].describe())
+    print gaze_durations['fixation duration'].describe()
+    print exp_FD_dict['GZD'].describe()
 
 
     # ax = plt.subplot(323)
@@ -723,10 +723,10 @@ def plot_FD_hists(total_viewing_time,gaze_durations,df_single_fixations,first_fi
     ax.set_xlim([0, 500])
     df_single_fixations['fixation duration'].plot(alpha=0.5, kind = 'density',sharex=False, bw_method=band_width)
     exp_FD_dict['SFD'].plot(alpha=0.5, kind = 'density',color = 'g',sharex=False, bw_method=band_width)
-    print(df_single_fixations['fixation duration'].describe())
-    print(exp_FD_dict['SFD'].describe())
-    print(df_single_fixations['fixation duration'].mean())
-    print(exp_FD_dict['SFD'][(exp_FD_dict['SFD']<350) & (exp_FD_dict['SFD']>125)].mean())
+    print df_single_fixations['fixation duration'].describe()
+    print exp_FD_dict['SFD'].describe()
+    print df_single_fixations['fixation duration'].mean()
+    print exp_FD_dict['SFD'][(exp_FD_dict['SFD']<350) & (exp_FD_dict['SFD']>125)].mean()
 
     # ax = plt.subplot(324)
     # ax.set_title("First fixation durations")

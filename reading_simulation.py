@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: ISO-8859-1 -*-
+# -*- coding: utf-8 -*-
 # Author: J.J. Snell & S.G. van Leipsig
 # supervised by dr. M. Meeter
 # 01-07-15
@@ -72,7 +72,7 @@ def reading_simulation(filename, parameters):
 #        textsplitbyspace = textsplitbyspace[:1000]
     for word in textsplitbyspace:
         if word.strip()!="":
-            new_word = np.unicode(word.strip())  # make sure words are unicode (numpy.unicode_ can cause errors)
+            new_word = unicode(word.strip())  # make sure words are unicode (numpy.unicode_ can cause errors)
             individual_words.append(new_word)
     target_words = []
     target_word_sf = []
@@ -120,11 +120,11 @@ def reading_simulation(filename, parameters):
     ## Make individual words dependent variables
 
     TOTAL_WORDS = len(individual_words)
-    print("LENGTH of freq dict: "+str(len(word_freq_dict)))
-    print("LENGTH of individual words: "+str(len(individual_words)))
+    print "LENGTH of freq dict: "+str(len(word_freq_dict))
+    print "LENGTH of individual words: "+str(len(individual_words))
+    
 
-
-    # array with recognition flag for each word position in the text.
+    # array with recognition flag for each word position in the text. 
     # is set to true when a word whose length is similar to that of the fixated word, is recognised
     # so if it fulfills the condition is_similar_word_length(fixated_word,other_word)
     recognized_position_flag = np.zeros(len(individual_words),dtype=bool)
@@ -142,18 +142,18 @@ def reading_simulation(filename, parameters):
     #---------------------------------------------------------------------------
     ## Make lexicon. Makes sure lexicon contains no double words.
 
-    for i in range(len(individual_words)):
+    for i in xrange(len(individual_words)):
         if individual_words[i] not in lexicon:
             lexicon.append(individual_words[i])
-    print("size lexicon before freq: "+str(len(lexicon)))
+    print "size lexicon before freq: "+str(len(lexicon))
     if(len(word_freq_dict)>0):
         for freq_word in word_freq_dict.keys():
             if freq_word not in lexicon:
                 lexicon.append(freq_word.lower())
 
-    print("size lexicon after freq: "+str(len(lexicon)))
+    print "size lexicon after freq: "+str(len(lexicon))
     lexicon_file_name = 'Data/Lexicon.dat'
-    with open(lexicon_file_name,"wb") as f:
+    with open(lexicon_file_name,"w") as f:
         pickle.dump(lexicon, f)
     f.close()
     #sort alphabetically ... for debugging purposes (doesn't affect simulation)
@@ -181,7 +181,7 @@ def reading_simulation(filename, parameters):
     lexicon_thresholds_np = np.zeros((LEXICON_SIZE),dtype=float)
 
     for i,word in enumerate(lexicon):
-        lexicon_thresholds_np[i] = get_threshold(word,word_freq_dict,max_frequency,word_pred_values,pm.wordfreq_p,pm.wordpred_p,pm.wordlen_lin,pm.start_lin)+0.014*len(lexicon[i])**1.15
+        lexicon_thresholds_np[i] = get_threshold(word,word_freq_dict,max_frequency,word_pred_values,pm.wordfreq_p,pm.wordpred_p,pm.wordlen_lin,pm.start_lin)+0.014*len(lexicon[i])**1.15 
         lexicon_index_dict[word] = i
         lexicon_word_activity[word] = 0.0
 
@@ -191,7 +191,7 @@ def reading_simulation(filename, parameters):
         individual_to_lexicon_indices[i] = lexicon.index(word)
 
     ## lexicon bigram dict
-    for word in range(LEXICON_SIZE):
+    for word in xrange(LEXICON_SIZE):
         lexicon[word] = " "+lexicon[word]+" "
         [all_word_ngrams, bigramLocations] = stringToBigramsAndLocations(" "+lexicon[word]+" ")
         all_word_bigrams = []
@@ -203,12 +203,12 @@ def reading_simulation(filename, parameters):
         lexicon[word] = lexicon[word][1:(len(lexicon[word])-1)]
         lexicon_word_bigrams[lexicon[word]] = all_word_bigrams
 
-    print("Amount of words in lexicon: ",LEXICON_SIZE)
-    print("Amount of words in text:",TOTAL_WORDS)
-    print("")
+    print "Amount of words in lexicon: ",LEXICON_SIZE
+    print "Amount of words in text:",TOTAL_WORDS
+    print ""
 
 #-----------------------------------------------------------------------------------------
-    print("Setting up word-to-word inhibition grid...")
+    print "Setting up word-to-word inhibition grid..."
 
     # Set up the list of word inhibition pairs, with amount of bigram/monograms overlaps for every pair.
     #initialize inhibition matrix with false
@@ -217,8 +217,8 @@ def reading_simulation(filename, parameters):
 
     complete_selective_word_inhibition = True
     overlap_list = {}
-    for other_word in range(LEXICON_SIZE):
-        for word in range(LEXICON_SIZE):
+    for other_word in xrange(LEXICON_SIZE):
+        for word in xrange(LEXICON_SIZE):
             if lexicon[word]==lexicon[other_word]:
                 continue
 
@@ -227,7 +227,7 @@ def reading_simulation(filename, parameters):
                 bigrams_common = []
                 bigrams_append = bigrams_common.append
                 bigram_overlap_counter = 0
-                for bigram in range(len(lexicon_word_bigrams[lexicon[word]])):
+                for bigram in xrange(len(lexicon_word_bigrams[lexicon[word]])):
                     if lexicon_word_bigrams[lexicon[word]][bigram] in lexicon_word_bigrams[lexicon[other_word]]:
                         bigrams_append(lexicon_word_bigrams[lexicon[word]][bigram])
                         lexicon_word_bigrams_set[lexicon[word]] = set(lexicon_word_bigrams[lexicon[word]])
@@ -238,7 +238,7 @@ def reading_simulation(filename, parameters):
                 monogram_overlap_counter = 0
 
                 unique_word_letters = ''.join(set(lexicon[word]))
-                for pos in range(len(unique_word_letters)):
+                for pos in xrange(len(unique_word_letters)):
                     monogram = unique_word_letters[pos]
                     if monogram in lexicon[other_word]:
                         monograms_append(monogram)
@@ -266,20 +266,20 @@ def reading_simulation(filename, parameters):
     # Save overlap matrix, with individual words selected
     #C:/Users/SAM/PycharmProjects/StageVu/
     output_inhibition_matrix = 'Data/Inhibition_matrix.dat'
-    with open(output_inhibition_matrix,"wb") as f:
+    with open(output_inhibition_matrix,"w") as f:
         #pickle.dump(word_overlap_matrix[individual_to_lexicon_indices],f)
         pickle.dump(np.sum(word_overlap_matrix,axis=0)[individual_to_lexicon_indices],f)
         # print np.sum(word_overlap_matrix,axis=0)[individual_to_lexicon_indices]
 
 
-    print("Inhibition grid ready.")
-    print("")
+    print "Inhibition grid ready."
+    print ""
   #---------------------------------------------------------------------------
-    print("BEGIN READING")
-    print("")
-    print("")
-    print("")
-    print("")
+    print "BEGIN READING"
+    print ""
+    print ""
+    print ""
+    print ""
 
     ## Initialize
     ## Parameters
@@ -360,9 +360,9 @@ def reading_simulation(filename, parameters):
         my_print( "ALLOCATED:",already_allocated,allocated_dict.keys())
         for i in already_allocated:
             try:
-                print(lexicon[i])
+                print lexicon[i]
             except:
-                print("Escaping annoying encoding error while printing")
+                print "Escaping annoying encoding error while printing"
             if not regression and i == individual_to_lexicon_indices[fixation]:
                 N_in_allocated += 1
                 to_pauze = True
@@ -373,16 +373,16 @@ def reading_simulation(filename, parameters):
 
         # To find the words that are wrongly allocated
         if pm.pauze_allocation_errors and to_pauze:
-            print("PAUSE, type anything to continue")
+            print "PAUSE, type anything to continue"
             response  = raw_input()
             to_pauze=False
-            print(norm_pred_values)
+            print norm_pred_values
 
         saccade_time = CYCLE_SIZE * (saccade_distance/8.0) # elapsed time during eye movement, in milliseconds  #todo why 8.0??
         total_reading_time += saccade_time+fixation_duration  # This variable is not really used as of yet; perhaps in later experiments. # TODO maybe also put in all_data
 
         if pm.slow_word_activity:
-            for word in range(len(lexicon_word_activity)):
+            for word in xrange(len(lexicon_word_activity)):
                 if lexicon_word_activity[lexicon[word]] < pm.min_activity:
                     lexicon_word_activity[lexicon[word]] = pm.min_activity
 
@@ -397,35 +397,35 @@ def reading_simulation(filename, parameters):
                                       'refixated':refixation, 'wordskipped':wordskip, 'regressed':regression,
                                       'forward':forward, 'fixation word activities':[],'word threshold':0, 'word frequency':0,
                                       'word predictability':0, 'saccade error':saccade_error,
-                                      'saccade distance':int(np.round(saccade_distance)),'wordskip pass':wordskip_pass,
+                                      'saccade distance':int(round(saccade_distance)),'wordskip pass':wordskip_pass,
                                       'refixation type':refixation_type,'saccade_type_by_error':saccade_type_by_error,
                                       'Offset':OffsetFromWordCenter,'relative landing position':Offset_previous}
 
 
-        Offset_previous = np.round(OffsetFromWordCenter)
+        Offset_previous = round(OffsetFromWordCenter)
 
         # Re-define the stimulus and calculate eye position, saccade error is implemented in OffsetFromWordCenter
         if fixation-2 == -2:
             stimulus = " "+individual_words[fixation]+" "+individual_words[fixation+1]+" "+individual_words[fixation+2]+" "
-            EyePosition =  np.round(len(individual_words[fixation])*0.5) + OffsetFromWordCenter
+            EyePosition =  round(len(individual_words[fixation])*0.5) + OffsetFromWordCenter
         elif fixation-2 == -1:
             stimulus = " "+individual_words[fixation-1]+" "+individual_words[fixation]+" "+individual_words[fixation+1]+" "+individual_words[fixation+2]+" "
-            EyePosition =  np.round(len(individual_words[fixation])*0.5) + len(individual_words[fixation-1]) + 1 + OffsetFromWordCenter
+            EyePosition =  round(len(individual_words[fixation])*0.5) + len(individual_words[fixation-1]) + 1 + OffsetFromWordCenter
         elif fixation+2 == TOTAL_WORDS+1:
             stimulus = " "+individual_words[fixation-2]+" "+individual_words[fixation-1]+" "+individual_words[fixation]+" "
-            EyePosition = len(individual_words[fixation-2]) + len(individual_words[fixation-1]) +  np.round(len(individual_words[fixation])*0.5) + 2 + OffsetFromWordCenter
+            EyePosition = len(individual_words[fixation-2]) + len(individual_words[fixation-1]) +  round(len(individual_words[fixation])*0.5) + 2 + OffsetFromWordCenter
         elif fixation+2 == TOTAL_WORDS:
             stimulus = " "+individual_words[fixation-2]+" "+individual_words[fixation-1]+" "+individual_words[fixation]+" "+individual_words[fixation+1]+" "
-            EyePosition = len(individual_words[fixation-2]) + len(individual_words[fixation-1]) +  np.round(len(individual_words[fixation])*0.5) + 2 + OffsetFromWordCenter
+            EyePosition = len(individual_words[fixation-2]) + len(individual_words[fixation-1]) +  round(len(individual_words[fixation])*0.5) + 2 + OffsetFromWordCenter
         elif fixation-2 == 0:
             stimulus = " "+individual_words[fixation-2]+" "+individual_words[fixation-1]+" "+individual_words[fixation]+" "+individual_words[fixation+1]+" "+individual_words[fixation+2]+" "
-            EyePosition =  np.round(len(individual_words[fixation])*0.5) + len(individual_words[fixation-1]) + len(individual_words[fixation-2]) + 2 + OffsetFromWordCenter
+            EyePosition =  round(len(individual_words[fixation])*0.5) + len(individual_words[fixation-1]) + len(individual_words[fixation-2]) + 2 + OffsetFromWordCenter
         else:
             stimulus = " "+individual_words[fixation-2]+" "+individual_words[fixation-1]+" "+individual_words[fixation]+" "+individual_words[fixation+1]+" "+individual_words[fixation+2]+" "
-            EyePosition = np.round(len(individual_words[fixation])*0.5) + len(individual_words[fixation-1]) + len(individual_words[fixation-2]) + 2 + OffsetFromWordCenter
+            EyePosition = round(len(individual_words[fixation])*0.5) + len(individual_words[fixation-1]) + len(individual_words[fixation-2]) + 2 + OffsetFromWordCenter
 
         #make sure that eyeposition is an integer
-        EyePosition = int(np.round(EyePosition))
+        EyePosition = int(round(EyePosition))
         my_print( "Start Eye:",OffsetFromWordCenter,stimulus[EyePosition:EyePosition+4])
 
         #as part of the saccade, narrow attention width by 2 letters in the case of regressions or widen it by 0.5 letters in forward saccades
@@ -466,10 +466,10 @@ def reading_simulation(filename, parameters):
         # Fill in entries into all_data
         all_data[fixation_counter]['stimulus']=stimulus
         all_data[fixation_counter]['eye position']=EyePosition
-        for word in range(len(stimulus.split(" "))-2):
+        for word in xrange(len(stimulus.split(" "))-2):
             all_data[fixation_counter]['word activities per cycle'].append({stimulus.split(" ")[word+1]:[]})
             # Above: "Word activities per cycle" is a dict containing the stimulus' words. For every word there is a list that will keep track of the activity per cycle.
-
+        
     #------------------------------------------------------------------------------
         # Only stimulus bigrams, monograms are in allNgrams
         # bigramsToLocations = (firstloc, secondloc, weight)
@@ -503,21 +503,21 @@ def reading_simulation(filename, parameters):
         fixationFirstPositionLeftToMiddle = None
 
         #substract offset to get the fixation word actual center position (used to calculate first/last index)
-        fixationCenter = EyePosition - int(np.round(OffsetFromWordCenter))
+        fixationCenter = EyePosition - int(round(OffsetFromWordCenter))
 
         centerWordFirstLetterIndex = None
         centerWordLastLetterIndex = None
 
         #identify the beginning and end of fixation word by looking at the first letter following a space, counted to the left of the center,
         #and the first letter followed by a space, counted to the right from the center
-        for letter_index in range(int(fixationCenter),len(stimulus)):
+        for letter_index in xrange(int(fixationCenter),len(stimulus)):
             if stimulus[letter_index]==" ":
                 centerWordLastLetterIndex = letter_index-1
                 if (centerWordLastLetterIndex == len(stimulus)-1):
                     assert(fixation==TOTAL_WORDS-1) #can only happen for last word
                 break
 
-        for letter_index_reversed in range(int(fixationCenter),-1,-1):
+        for letter_index_reversed in xrange(int(fixationCenter),-1,-1):
             if stimulus[letter_index_reversed]==" ":
                 centerWordFirstLetterIndex = letter_index_reversed+1
                 break
@@ -534,7 +534,7 @@ def reading_simulation(filename, parameters):
         stimulus_after_eyepos = stimulus[fixationFirstPositionRightToMiddle:-1]
 
         # CHECK UNICODE
-        if type(stimulus) is np.unicode:
+        if type(stimulus) is unicode:
             p = re.compile(r'\b\w+\b',re.UNICODE)
         else:
             p = re.compile(r'\b\w+\b')
@@ -706,14 +706,14 @@ def reading_simulation(filename, parameters):
 
             ## Active words selection vector
             lexicon_activewords_np[(lexicon_word_activity_np>0.0) | (word_input_np>0.0)] = True
-
+                                                        
             ## Calculate total inhibition for each word
 
             # ## SPEED TESTING
             # lexicon_word_inhibition_np = word_activations(LEXICON_SIZE,lexicon_activewords_np,word_overlap_matrix,lexicon_normalized_word_inhibition,lexicon_word_activity_np,lexicon_word_inhibition_np)
             # lexicon_word_inhibition_np2 = word_activations2(LEXICON_SIZE,lexicon_activewords_np,word_overlap_matrix,lexicon_normalized_word_inhibition,lexicon_word_activity_np,lexicon_word_inhibition_np)
             # np.testing.assert_allclose(lexicon_word_inhibition_np,lexicon_word_inhibition_np2)
-
+                                                        
             # ## Vector * Vector
             # for word_ix in xrange(LEXICON_SIZE):
             #     inhibiting_words_np = np.where((lexicon_activewords_np == True) & (word_overlap_matrix[word_ix,:]>0))[0]
@@ -757,7 +757,7 @@ def reading_simulation(filename, parameters):
             # Here, we check whether a shift will be made after the current cycle.
             # This can be due to the total activity threshold, or the recognition threshold.
             total_activity = 0
-            for word in range(len(stimulus.split(" "))-2):
+            for word in xrange(len(stimulus.split(" "))-2):
                 total_activity += lexicon_word_activity_np[lexicon_index_dict[stimulus.split(" ")[word+1]]]
 
             crt_fixation_word_activities[3]=lexicon_word_activity_np[lexicon_index_dict[individual_words[fixation]]]
@@ -894,9 +894,9 @@ def reading_simulation(filename, parameters):
 
                     # Check whether the previous word was recognized or there was already a regression performed. If not: regress.
                     elif fixation>1 and recognized_position_flag[fixation-1] == False and regression_flag[fixation-1]==False:
-                        AttentionPosition = getMidwordPositionForSurroundingWord(-1,rightWordEdgeLetterIndexes,leftWordEdgeLetterIndexes)
-                        OffsetFromWordCenter=0
-                        regression = True
+                            AttentionPosition = getMidwordPositionForSurroundingWord(-1,rightWordEdgeLetterIndexes,leftWordEdgeLetterIndexes)
+                            OffsetFromWordCenter=0
+                            regression = True
 
                     #elif (not recognized_position_flag[fixation]) and (lexicon_word_activity[individual_words[fixation]]>0):
                     elif (not recognized_position_flag[fixation]) and (lexicon_word_activity_np[lexicon_index_dict[individual_words[fixation]]]>0):
@@ -907,9 +907,9 @@ def reading_simulation(filename, parameters):
                         #TODO error in word_reminder_length, ->solved using +1 in refixsize?
                         word_reminder_length = rightWordEdgeLetterIndexes[0][1]-(rightWordEdgeLetterIndexes[0][0])
                         if(word_reminder_length>0):
-                        #Use first refixation middle of remaining half as refixation stepsize
+                            #Use first refixation middle of remaining half as refixation stepsize
                             if all_data[fixation_counter-1]['refixated'] !=True:
-                                refixsize = np.round((word_reminder_length)*pm.refix_size)
+                                refixsize = round((word_reminder_length)*pm.refix_size)
                                 AttentionPosition = fixationFirstPositionRightToMiddle + refixsize
                             else:
                                 AttentionPosition = fixationFirstPositionRightToMiddle + refixsize
@@ -936,7 +936,7 @@ def reading_simulation(filename, parameters):
                         if nextFixation == 0:
                             #Use first refixation middle of remaining half as refixation stepsize
                             if all_data[fixation_counter-1]['refixated'] !=True:
-                                refixsize = np.round((word_reminder_length)*pm.refix_size)
+                                refixsize = round((word_reminder_length)*pm.refix_size)
                                 AttentionPosition = fixationFirstPositionRightToMiddle + refixsize
                             else:
                                 AttentionPosition = fixationFirstPositionRightToMiddle + refixsize
@@ -979,9 +979,9 @@ def reading_simulation(filename, parameters):
                 recognized_word_at_cycle[fixation] = amount_of_cycles
 
             # Make sure that attention is integer
-            AttentionPosition = np.round(AttentionPosition)
+            AttentionPosition = round(AttentionPosition)
             amount_of_cycles += 1
-
+                
     # ----------------------------End of cycle--------------------------------------------------
 
         # After the last cycle, the fixation duration can be calculated.
@@ -1004,7 +1004,7 @@ def reading_simulation(filename, parameters):
 #                target_word_sf.append(fixation_duration)
 #                target_word_refixs.append(0)
 #                target_word_act.append(crt_fixation_word_activities_atshift[3])
-
+            
 
         all_data[fixation_counter]['fixation duration'] = fixation_duration
         all_data[fixation_counter]['recognition cycle'] = recognized_word_at_cycle[fixation]
@@ -1048,7 +1048,7 @@ def reading_simulation(filename, parameters):
         OffsetFromWordCenter = OffsetFromWordCenter + saccade_error
 
         ## Below, the position of the next fixation is calculated
-        nextEyePosition = int(np.round(EyePosition+saccade_distance))
+        nextEyePosition = int(round(EyePosition+saccade_distance))
         if nextEyePosition >= len(stimulus)-1:
             nextEyePosition = len(stimulus)-2
             assert(rightWordEdgeLetterIndexes[-1][1] == len(stimulus)-2)
@@ -1117,7 +1117,7 @@ def reading_simulation(filename, parameters):
             # Refixation due to saccade error
             if not refixation:
                 #TODO find out if not regression is necessary
-                centerposition = np.round(centerWordFirstLetterIndex + ((centerWordLastLetterIndex - centerWordFirstLetterIndex)/2.))
+                centerposition = round(centerWordFirstLetterIndex + ((centerWordLastLetterIndex - centerWordFirstLetterIndex)/2.))
                 OffsetFromWordCenter = nextEyePosition - centerposition
                 saccade_type_by_error = 1
                 refixation_type = 3
@@ -1142,22 +1142,22 @@ def reading_simulation(filename, parameters):
     # append unrecognized words to the list
     unrecognized_words = []
     unrecognized_words_append = unrecognized_words.append
-    for position in range(TOTAL_WORDS):
+    for position in xrange(TOTAL_WORDS):
         if not recognized_word_at_position_flag[position]:
             unrecognized_words_append((individual_words[position],position))
     #-----------------------------------------------------------------------------------------------------
 
     # END OF READING. Return all_data and the list of unrecognized words.
-    print(N_in_allocated,N1_in_allocated)
+    print N_in_allocated,N1_in_allocated
 #    print target_words
-#
+#    
 #    with open("C:\\Users\\Josh\\Desktop\\josh work\\Experiments\\BOB\\sam reading model july15\\sam reading model july15\\PSC\\newrep.txt", "w") as g:
-#       g.write('condition,SF,GD,refix,activity\n')
+#       g.write('condition,SF,GD,refix,activity\n') 
 #       for i in range(0,len(target_words)):
 #           g.write(target_words[i][0]+',0,'+str(target_word_sf[i])+','+str(target_word_gd[i])+','+str(target_word_refixs[i])+','+str(target_word_act[i])+'\n')
-#    g.close()
-
-
+#    g.close()    
+    
+    
     return (lexicon,all_data, unrecognized_words)
 
 #---------------------------------------------------------------------------------

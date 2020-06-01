@@ -46,7 +46,7 @@ def stringToBigramsAndLocations(stimulus):
     stimulus_space_positions = getStimulusSpacePositions(stimulus)
     # For the current stimulus, bigrams will be made. Bigrams are only made
     # for letters that are within a range of 4 from each other; (gap=3)
-
+    
     # Bigrams that contain word boundary letters have more weight.
     # This is done by means of locating spaces in stimulus, and marking
     # letters around space locations (as well as spaces themselves), as
@@ -58,41 +58,41 @@ def stringToBigramsAndLocations(stimulus):
     bigramsToLocations = {}
     gap = pm.bigram_gap # None = no limit
     if gap == None:
-        for first in range(len(stimulus) - 1):
-            if(stimulus[first]==" "):
-                continue
-            for second in range(first + 1, len(stimulus)):
-                if(stimulus[second]==" "):
-                    break
-                bigram = stimulus[first]+stimulus[second]
-                if bigram!='  ':
-                    if not bigram in allBigrams:
-                        allBigrams_append(bigram)
-                    bigramEdgePositionWeight = getNgramEdgePositionWeight(bigram, (first,second),stimulus_space_positions )
-                    if(bigram in bigramsToLocations.keys()):
-                        bigramsToLocations[bigram].append((first,second,bigramEdgePositionWeight))
-                    else:
-                        bigramsToLocations[bigram]=[(first,second,bigramEdgePositionWeight)]
+            for first in xrange(len(stimulus) - 1):
+                    if(stimulus[first]==" "):
+                        continue
+                    for second in range(first + 1, len(stimulus)):
+                            if(stimulus[second]==" "):
+                                break
+                            bigram = stimulus[first]+stimulus[second]
+                            if bigram!='  ':
+                                    if not bigram in allBigrams:
+                                        allBigrams_append(bigram)
+                                    bigramEdgePositionWeight = getNgramEdgePositionWeight(bigram, (first,second),stimulus_space_positions )
+                                    if(bigram in bigramsToLocations.keys()):
+                                        bigramsToLocations[bigram].append((first,second,bigramEdgePositionWeight))
+                                    else:
+                                        bigramsToLocations[bigram]=[(first,second,bigramEdgePositionWeight)]
     else:
-        for first in range(len(stimulus) - 1):
-            if(stimulus[first]==" "):
-                continue
-            for second in range(first + 1, min(first+1+gap+1,len(stimulus))):
-                if(stimulus[second]==" "):
-                    break
-                bigram=stimulus[first]+stimulus[second]
-                if bigram!='  ':
-                    if not bigram in allBigrams:
-                        allBigrams_append(bigram)
-                    bigramEdgePositionWeight = getNgramEdgePositionWeight(bigram, (first,second), stimulus_space_positions)
-                    if(bigram in bigramsToLocations.keys()):
-                        bigramsToLocations[bigram].append((first,second,bigramEdgePositionWeight))
-                    else:
-                        bigramsToLocations[bigram]=[(first,second,bigramEdgePositionWeight)]
+            for first in xrange(len(stimulus) - 1):
+                    if(stimulus[first]==" "):
+                        continue
+                    for second in range(first + 1, min(first+1+gap+1,len(stimulus))):
+                            if(stimulus[second]==" "):
+                                break
+                            bigram=stimulus[first]+stimulus[second]
+                            if bigram!='  ':
+                                    if not bigram in allBigrams:
+                                        allBigrams_append(bigram)
+                                    bigramEdgePositionWeight = getNgramEdgePositionWeight(bigram, (first,second), stimulus_space_positions)
+                                    if(bigram in bigramsToLocations.keys()):
+                                        bigramsToLocations[bigram].append((first,second,bigramEdgePositionWeight))
+                                    else:
+                                        bigramsToLocations[bigram]=[(first,second,bigramEdgePositionWeight)] 
 
 
     """Also add monograms"""
-    for position in range(len(stimulus)):
+    for position in xrange(len(stimulus)):
         monogram=stimulus[position]
         if(monogram==" "):
             continue
@@ -126,73 +126,73 @@ def calcAcuity(eye_eccentricity,letPerDeg):
 
 #parameters shift and amount of cycles are used only for reading
 def calcBigramExtInput(bigram, bigrLocsStimulus, EyePosition, AttentionPosition, attendWidth, shift = True, amount_of_cycles=0):
-    sumExtInput=0
-    # Here we look up all instances of same bigram. Act of all is summed (this is somewhat of a questionable assumption, perhaps max() would be better
-    locations = bigrLocsStimulus[bigram]
-    #todo check if locations weights multiplier is correct fixated words
-    for bigram_letter_locations in locations:
-        bigram_locations_weight_multiplier = bigram_letter_locations[2]
+        sumExtInput=0
+        # Here we look up all instances of same bigram. Act of all is summed (this is somewhat of a questionable assumption, perhaps max() would be better
+        locations = bigrLocsStimulus[bigram]
+        #todo check if locations weights multiplier is correct fixated words
+        for bigram_letter_locations in locations:
+            bigram_locations_weight_multiplier = bigram_letter_locations[2]
 
-        # Bigram activity depends on distance of bigram letters to the centre of attention and fixation
-        # and left/right is skewed using negative/positve att_ecc
+            # Bigram activity depends on distance of bigram letters to the centre of attention and fixation
+            # and left/right is skewed using negative/positve att_ecc
 
-        attention_eccentricity1=bigram_letter_locations[0]-AttentionPosition
-        attention_eccentricity2=bigram_letter_locations[1]-AttentionPosition
+            attention_eccentricity1=bigram_letter_locations[0]-AttentionPosition
+            attention_eccentricity2=bigram_letter_locations[1]-AttentionPosition
 
-        eye_eccentricity1= abs(bigram_letter_locations[0]-EyePosition)
-        eye_eccentricity2= abs(bigram_letter_locations[1]-EyePosition)
+            eye_eccentricity1= abs(bigram_letter_locations[0]-EyePosition)
+            eye_eccentricity2= abs(bigram_letter_locations[1]-EyePosition)
 
-        attention1=get_attention_skewed(attendWidth, attention_eccentricity1,pm.attention_skew)
-        attention2=get_attention_skewed(attendWidth, attention_eccentricity2,pm.attention_skew)
+            attention1=get_attention_skewed(attendWidth, attention_eccentricity1,pm.attention_skew)
+            attention2=get_attention_skewed(attendWidth, attention_eccentricity2,pm.attention_skew)
 
-        # Parameters from Harvey & Dumoulin (2007); 35.55556 is to make acuity at 0 degs eq. to 1
-        visualAccuity1 = calcAcuity(eye_eccentricity1,pm.letPerDeg)
-        visualAccuity2 = calcAcuity(eye_eccentricity2,pm.letPerDeg)
+            # Parameters from Harvey & Dumoulin (2007); 35.55556 is to make acuity at 0 degs eq. to 1
+            visualAccuity1 = calcAcuity(eye_eccentricity1,pm.letPerDeg)
+            visualAccuity2 = calcAcuity(eye_eccentricity2,pm.letPerDeg)
 
-        extInput1 = attention1*visualAccuity1
-        extInput2 = attention2*visualAccuity2
-        extInput=math.sqrt(extInput1*extInput2)
+            extInput1 = attention1*visualAccuity1
+            extInput2 = attention2*visualAccuity2
+            extInput=math.sqrt(extInput1*extInput2)
 
-        sumExtInput=sumExtInput+extInput * bigram_locations_weight_multiplier
+            sumExtInput=sumExtInput+extInput * bigram_locations_weight_multiplier
 
-    return sumExtInput
+        return sumExtInput
 
 
 def calcMonogramExtInput(monogram,bigrLocsStimulus,EyePosition, AttentionPosition, attendWidth, shift = True, amount_of_cycles=0):
-    sumExtInput=0
-    # Here we look up all instances of same monogram. Act of all is summed
-    locations = bigrLocsStimulus[monogram]
+        sumExtInput=0
+        # Here we look up all instances of same monogram. Act of all is summed
+        locations = bigrLocsStimulus[monogram]
 
-    for monogram_position in locations:
-        monogram_locations_weight_multiplier = monogram_position[1]
-        # Monogram activity depends on distance of bigram letters to the centre of attention and fixation
+        for monogram_position in locations:
+            monogram_locations_weight_multiplier = monogram_position[1]
+            # Monogram activity depends on distance of bigram letters to the centre of attention and fixation
 
-        attention_eccentricity1=monogram_position[0]-AttentionPosition
-        eye_eccentricity1= abs(monogram_position[0]-EyePosition)
+            attention_eccentricity1=monogram_position[0]-AttentionPosition
+            eye_eccentricity1= abs(monogram_position[0]-EyePosition)
 
-        attention1=get_attention_skewed(attendWidth, attention_eccentricity1,pm.attention_skew)
-        visualAccuity1 = calcAcuity(eye_eccentricity1,pm.letPerDeg)
+            attention1=get_attention_skewed(attendWidth, attention_eccentricity1,pm.attention_skew)
+            visualAccuity1 = calcAcuity(eye_eccentricity1,pm.letPerDeg)
 
-        extInput = attention1*visualAccuity1
-        sumExtInput += extInput * monogram_locations_weight_multiplier
+            extInput = attention1*visualAccuity1
+            sumExtInput += extInput * monogram_locations_weight_multiplier
 
-    return sumExtInput
+        return sumExtInput
 
 
 def calcContrast(monogram_postition,EyePosition,AttentionPosition,attendWidth):
-    attention_eccentricity1=monogram_postition-AttentionPosition
-    eye_eccentricity1= abs(monogram_postition-EyePosition)
-    attention1=get_attention_skewed(attendWidth, attention_eccentricity1,pm.attention_skew)
-    visualAccuity1 = calcAcuity(eye_eccentricity1,pm.letPerDeg)
+        attention_eccentricity1=monogram_postition-AttentionPosition
+        eye_eccentricity1= abs(monogram_postition-EyePosition)
+        attention1=get_attention_skewed(attendWidth, attention_eccentricity1,pm.attention_skew)
+        visualAccuity1 = calcAcuity(eye_eccentricity1,pm.letPerDeg)
 
-    return attention1*visualAccuity1
+        return attention1*visualAccuity1
 
 
 #parameters shift and amount of cycles are used only for reading
 #this is only used to calculate where to move next when forward saccade
 def calcMonogramAttentionSum(positionStart, numberOfLetters, EyePosition, AttentionPosition, attendWidth, foveal_word, shift = True):
     sumAttentionLetters=0
-    for letter_location in range(positionStart,(positionStart+numberOfLetters)+1):
+    for letter_location in xrange(positionStart,(positionStart+numberOfLetters)+1):
         monogram_locations_weight_multiplier = 0.5
         if foveal_word:
             if letter_location == positionStart+numberOfLetters:

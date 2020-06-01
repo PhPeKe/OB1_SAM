@@ -1,4 +1,4 @@
-# -*- coding: ISO-8859-1 -*-
+__author__ = 'SAM'
 
 import numpy as np
 import pickle
@@ -221,7 +221,7 @@ def get_lagsuccessor(freqbins, predbins):
     SF_nextpred_groups = pd.cut(saccade_data['next pred'], predbins)
     df_SF_lagsucc_dict['lag pred'] = saccade_data.groupby(SF_previouspred_groups)['SFD'].agg(np.mean)
     df_SF_lagsucc_dict['succ pred'] = saccade_data.groupby(SF_nextpred_groups)['SFD'].agg(np.mean)
-
+    
     df_GD_lagsucc_dict = {}
     df_GD_lagsucc_dict['lag length'] = saccade_data.groupby('previous length')['GZD'].agg(np.mean)
     df_GD_lagsucc_dict['succ length'] = saccade_data.groupby('next length')['GZD'].agg(np.mean)
@@ -330,11 +330,11 @@ def get_freq_pred_files():
     ## hardcoded to take freq/pred from all psc's
     #C:/Users/SAM/PycharmProjects/StageVu/
     output_word_frequency_map = "Data/PSCall_frequency_map.dat"
-    with open (output_word_frequency_map,"rb") as f:
-        word_freq_dict = pickle.load(f, encoding="latin1")
+    with open (output_word_frequency_map,"r") as f:
+        word_freq_dict = pickle.load(f)
     output_word_predictions_map = "Data/PSCall_predictions_map.dat"
-    with open (output_word_predictions_map,"rb") as p:
-        word_pred_dict = pickle.load(p, encoding="latin1")
+    with open (output_word_predictions_map,"r") as p:
+        word_pred_dict = pickle.load(p)
     return word_freq_dict, word_pred_dict
 
 def get_saccade_data_df():
@@ -365,7 +365,7 @@ def get_pred():
 def get_freq_and_pred():
     convert_dict = {0:decode_ISO,1:comma_to_dot, 2:comma_to_dot}
     # Changed this, old code threw an decode error
-    my_data = pd.read_csv("Texts/PSCall_freq_pred.txt",delimiter="\t", encoding="latin1")
+    my_data = pd.read_csv("Texts/PSCall_freq_pred.txt",delimiter="\t")
 #    my_data = np.genfromtxt("Texts/PSCall_freq_pred.txt", names =True,encoding="latin-1",  dtype=['U2','f4','f4'], converters = convert_dict, skip_header=0, delimiter="\t")
     predictions_dict = {}
     return my_data
@@ -373,7 +373,7 @@ def get_freq_and_pred():
 def get_freq_and_syntax_pred():
     convert_dict = {0:decode_ISO,1:comma_to_dot, 2:comma_to_dot}
     # Changed this, old code threw an decode error
-    my_data = pd.read_csv("Texts/PSCall_freq_pred.txt",delimiter="\t", encoding="latin1")
+    my_data = pd.read_csv("Texts/PSCall_freq_pred.txt",delimiter="\t")
     sys.path.append("Data")
     print("Using syntax pred values")
     with open("Data/PSCALLsyntax_probabilites.pkl", "r") as f:

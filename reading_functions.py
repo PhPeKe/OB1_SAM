@@ -11,8 +11,8 @@ import math
 def my_print(*args):
     if pm.print_all:
         for i in args:
-            print(i)
-        print("")
+            print i,
+        print
 
 
 def is_similar_word_length(word1,word2):
@@ -70,6 +70,6 @@ def calc_saccade_error(saccade_distance,optimal_distance,saccErr_scaler,saccErr_
 
 def norm_distribution(mu,sigma,distribution_param,recognized):
     if recognized:
-        return int(np.round(np.random.normal(mu-distribution_param,sigma,1)))
+        return int(round(np.random.normal(mu-distribution_param,sigma,1)))
     else:
-        return int(np.round(np.random.normal(mu,sigma,1)))
+        return int(round(np.random.normal(mu,sigma,1)))

@@ -53,7 +53,7 @@ def monogram_activation_set(word,allMonograms,lexicon_word_bigrams,unitActivatio
 
 
 def word_activations(LEXICON_SIZE,lexicon_activewords_np,word_overlap_matrix,lexicon_normalized_word_inhibition,lexicon_word_activity_np,lexicon_word_inhibition_np):
-    for word_ix in range(LEXICON_SIZE):
+    for word_ix in xrange(LEXICON_SIZE):
         inhibiting_words_np = np.where((lexicon_activewords_np == True) & (word_overlap_matrix[word_ix,:]>0))[0]
         norm_lexicon_word_activity = lexicon_normalized_word_inhibition * lexicon_word_activity_np[inhibiting_words_np]
         total_word_inhibition = np.dot(word_overlap_matrix[word_ix,inhibiting_words_np],norm_lexicon_word_activity)
@@ -69,3 +69,6 @@ def word_activations2(LEXICON_SIZE,lexicon_activewords_np,word_overlap_matrix,le
     #     lexicon_word_inhibition_np_2[word_ix] = total_word_inhibition
     # print "Equality",np.allclose(lexicon_word_inhibition_np,lexicon_word_inhibition_np_2)
     return lexicon_word_inhibition_np
+
+
+

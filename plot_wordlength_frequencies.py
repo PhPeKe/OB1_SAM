@@ -19,20 +19,20 @@ def all_indices(value, qlist):
     return indices
 
 def draw_boxplot(classes_array,values_array,ax):
-    unique_classes = np.unique(fixation_position_lengths)
+	unique_classes = np.unique(fixation_position_lengths)
+		
+	boxplot_values_list = []
+	for class_name in unique_classes:
+		indexes = all_indices(class_name,classes_array)
+		values = []
+		for value_index in indexes:
+			values.append(values_array[value_index])
 
-    boxplot_values_list = []
-    for class_name in unique_classes:
-        indexes = all_indices(class_name,classes_array)
-        values = []
-        for value_index in indexes:
-            values.append(values_array[value_index])
+		boxplot_values_list.append(values)
 
-        boxplot_values_list.append(values)
-
-    plt.boxplot(boxplot_values_list)
-    plt.xticks(unique_classes)
-    plt.ylim(max( min(values_array) *0.8, 0), max(values_array)*1.25  )
+	plt.boxplot(boxplot_values_list)
+	plt.xticks(unique_classes)
+	plt.ylim(max( min(values_array) *0.8, 0), max(values_array)*1.25  )
 
 input_text_filename = "texts/POS.txt"
 textfile=get_stimulus_text_from_file(input_text_filename)
@@ -49,7 +49,7 @@ for word in textsplitbyspace:
 
 word_lengths = []
 for word in individual_words:
-    word_lengths.append(len(word))
+	word_lengths.append(len(word))
 
 individual_words = []
 textsplitbyspace = textfile2.split(" ")
@@ -59,7 +59,7 @@ for word in textsplitbyspace:
 
 word_lengths2 = []
 for word in individual_words:
-    word_lengths2.append(len(word))
+	word_lengths2.append(len(word))
 
 minx = 0
 maxx=18

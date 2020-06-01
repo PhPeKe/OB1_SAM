@@ -6,10 +6,6 @@ see:
 
 https://www.ncbi.nlm.nih.gov/pubmed/30080066
 
-## Requirements:
-
-Python2.7
-
 ### parameters.py
 This is the most important function for controlling the behavior of *main.py*. Here the user can specify which parts of the programm should be run and also set the initial parameters when tuning. Furthermore the user can define which measures are used as error-function for the tuning process. 
 

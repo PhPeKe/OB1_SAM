@@ -54,10 +54,11 @@ def reading_simulation(filename, parameters):
 
 #        pm.mu = parameters[3]
 #        pm.sigma = parameters[4]
-#        pm.distribution_param = parameters[5]
-        pm.wordfreq_p = parameters[0]
-        pm.wordpred_p = parameters[1]
 
+#        pm.distribution_param = parameters[5]
+#        pm.wordfreq_p = parameters[0]
+#        pm.wordpred_p = parameters[0]
+        pass
 
     lexicon = []
     all_data = []
@@ -122,7 +123,7 @@ def reading_simulation(filename, parameters):
     TOTAL_WORDS = len(individual_words)
     print "LENGTH of freq dict: "+str(len(word_freq_dict))
     print "LENGTH of individual words: "+str(len(individual_words))
-    
+
 
     # array with recognition flag for each word position in the text. 
     # is set to true when a word whose length is similar to that of the fixated word, is recognised

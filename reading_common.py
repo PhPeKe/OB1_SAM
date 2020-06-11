@@ -14,6 +14,7 @@ def getStimulusSpacePositions(stimulus):
 
     return stimulus_space_positions
 
+
 def getNgramEdgePositionWeight(ngram,ngramLocations,stimulus_space_locations):
     ngramEdgePositionWeight = 0.5 # This is just a default weight; in many cases, it's changed
                               # to 1 or 2, as can be seen below.
@@ -41,6 +42,7 @@ def getNgramEdgePositionWeight(ngram,ngramLocations,stimulus_space_locations):
             ngramEdgePositionWeight = 1.
 
     return ngramEdgePositionWeight
+
 
 def stringToBigramsAndLocations(stimulus):
     stimulus_space_positions = getStimulusSpacePositions(stimulus)
@@ -105,7 +107,7 @@ def stringToBigramsAndLocations(stimulus):
 #            bigramsToLocations[monogram].append((position,monogramEdgePositionWeight))
 #        else:
 #            bigramsToLocations[monogram]=[(position,monogramEdgePositionWeight)]
-    return [allBigrams,bigramsToLocations]
+    return [allBigrams, bigramsToLocations]
 
 
 def get_attention_skewed(attentionWidth,attention_eccentricity,attention_skew):

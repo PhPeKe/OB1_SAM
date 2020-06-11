@@ -6,8 +6,8 @@ __author__ = 'Sam van Leipsig, Phillip Kersten'
 print("Parameters Initialised")
 
 # Control-flow parameters
-run_exp = True  # Should the reading simulation run?
-analyze_results = True  # Should the results be analyzed?
+run_exp = True #True  # Should the reading simulation run?
+analyze_results = False #True  # Should the results be analyzed?
 optimize = False  # Should the parameters be optimized?
 
 language = "german"  # german, dutch

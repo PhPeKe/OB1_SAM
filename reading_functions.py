@@ -1,5 +1,4 @@
 # CHANGED
-
 __author__ = 'Sam van Leipsig'
 import parameters as pm
 import numpy as np
@@ -11,8 +10,8 @@ import math
 def my_print(*args):
     if pm.print_all:
         for i in args:
-            print i,
-        print
+            print(i)
+        print("")
 
 
 def is_similar_word_length(word1,word2):
@@ -44,11 +43,11 @@ def get_threshold(word,word_freq_dict,max_frequency,word_pred_dict,freq_p,pred_p
             word_frequency_multiplier = ((freq_p * max_frequency) - word_frequency) / (freq_p * max_frequency)
         except KeyError:
             pass
-    if pm.linear:
-        return (word_frequency_multiplier) * (len_p * len(word)) + start_p
-    else:
-        #return (word_frequency_multiplier * word_predictability_multiplier) * (pm.start_nonlin - (pm.nonlin_scaler*(math.exp(pm.wordlen_nonlin*len(word)))))
-        return (word_frequency_multiplier) * (pm.start_nonlin - (pm.nonlin_scaler*(math.exp(pm.wordlen_nonlin*len(word)))))
+#    if pm.linear:
+#        return (word_frequency_multiplier) * (len_p * len(word)) + start_p
+#    else:
+#        #return (word_frequency_multiplier * word_predictability_multiplier) * (pm.start_nonlin - (pm.nonlin_scaler*(math.exp(pm.wordlen_nonlin*len(word)))))
+        return (word_frequency_multiplier) # GS * (pm.start_nonlin - (pm.nonlin_scaler*(math.exp(pm.wordlen_nonlin*len(word)))))
 
 
 def normalize_pred_values(pred_p,pred_values):
@@ -70,6 +69,6 @@ def calc_saccade_error(saccade_distance,optimal_distance,saccErr_scaler,saccErr_
 
 def norm_distribution(mu,sigma,distribution_param,recognized):
     if recognized:
-        return int(round(np.random.normal(mu-distribution_param,sigma,1)))
+        return int(np.round(np.random.normal(mu-distribution_param,sigma,1)))
     else:
-        return int(round(np.random.normal(mu,sigma,1)))
+        return int(np.round(np.random.normal(mu,sigma,1)))

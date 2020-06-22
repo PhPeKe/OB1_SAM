@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
+# -*- coding: UTF-8 -*-
 # Author: J.J. Snell & S.G. van Leipsig
 # supervised by dr. M. Meeter
 # 01-07-15
@@ -655,7 +655,7 @@ def reading_simulation(filename, parameters):
         previous_lexicon_values = lexicon_thresholds_np[lexicon_fixated_words]
         reset_pred_previous = True
         lexicon_thresholds_np[lexicon_fixated_words] = lexicon_thresholds_np\
-        [lexicon_fixated_words] * norm_pred_values
+                                                       [lexicon_fixated_words] * norm_pred_values
 
     # -------------------------------------------------------------------------------------------
         # A saccade program takes 5 cycles, or 125ms.
@@ -823,103 +823,178 @@ def reading_simulation(filename, parameters):
             recognized_lexicon_np = np.where(lexicon_word_activity_np > lexicon_thresholds_np)[0]
             # MM: array w. indices of recogn. words
             recognized_indices = np.asarray(all_data[fixation_counter]['recognized words indices'], dtype=int)
-            # MM: creates array w. 1 if recogn already in recognized_indices, 0 otherwise
-            already_recognized_words_selection = np.in1d(recognized_lexicon_np, recognized_indices)
-            new_recognized_words = recognized_lexicon_np[~already_recognized_words_selection]
 
-            for word_index in range(fixation - 2, fixation + 3):
-                if not recognized_position_flag[word_index]:
-                    # (-POS-tags)
-                    desired_length = len(individual_words[word_index])
-                    # Woorden met juiste lengtes
-                    # 1. recognized
-                    # Matrix 1: goede lengte, 0: verkeerde lengte
-                    # Matrix 2: matrix 1 * recognized, alles wat overblijft is goede lengtem hoogste pakken
-                    activation_dict = {word: value for word, value in zip(lexicon, lexicon_word_activity_np)}
-                    activation_sorted = [(word, value) for word, value in sorted(activation_dict.items(),
-                                                                                 key=lambda item: item[1], reverse=True)
-                                         if len(word == desired_length)]
-                    highest = activation_sorted[0]
+            # PK TODO  MM: is this pointwise multiplication? Should be and seems so
+            # PK: yes, i think if you use numpy it should be pointwise if you have two matrices with compatible
+            # shapes
+            ## recognWrds_w_length = recognized_lexicon_np * lengtes
+            new_recognized_words = np.zeros(LEXICON_SIZE)
+            # MM: Not sure this is correct but idea is, array of zeros of equal len as lexicon
 
+            # MM: Below functions defined to append arrays. Not sure why this is efficient (TO PK: do you know?)
+            # PK: no idea, never have seen this practice before
             alldata_recognized_append = all_data[fixation_counter]['recognized words indices'].append
             allocated_append = allocated_dict[fixation].append
             alldata_truerecognized_append = all_data[fixation_counter]['exact recognized words positions'].append
 
-            for word in new_recognized_words:
-                my_print('recognized: ',
-                         amount_of_cycles,
-                         'cycle,',
-                         lexicon[word],
-                         lexicon_word_activity_np[word] / lexicon_thresholds_np[word],
-                         '(ratio crt. activity to threshold)')
-                alldata_recognized_append(word)
-                # if yes, words are considered recognized based on similarity of word lengths
-                # otherwise, words are considered recognized only if they match exactly
-                # TODO think about regressions, should N be excluded from N-1 when regressed?
-                # MM: I don't really understand what happens below, but this should be changed anyway
-                if pm.similarity_based_recognition:
-                    # set the recognition flag to any of the words in a similar if they
-                    # fulfill the word length distance condition
-                    if is_similar_word_length(individual_words[fixation], lexicon[word]):
-                        # todo refixations cause problems, because might be that during
-                        #  refix N+1 is recognized before N
-                        # maybe just exclude the word during refixation
-                        # not N-2, N-1,
-                        if word not in already_allocated and not all_data[fixation_counter]['refixated']:
-                            if not recognized_position_flag[fixation] or (amount_of_cycles < 1
-                                                                          and not len(allocated_dict[fixation])):
-                                allocated_append(word)
-                            recognized_position_flag[fixation] = True
-                            # todo remove last appended before actual saccade, maybe == N+1
-                            my_print(('+++ 0',
-                                      lexicon[word],
-                                      ' recognized instead ',
-                                      individual_words[fixation]))
-                    elif shift and fixation + 1 < TOTAL_WORDS and is_similar_word_length(individual_words[fixation + 1],
-                                                                                         lexicon[word]):
-                        # not N-2, N-1, N
-                        if word not in already_allocated:
-                            recognized_position_flag[fixation + 1] = True
-                            my_print(('+++ +1',
-                                      lexicon[word],
-                                      ' recognized instead ',
-                                      individual_words[fixation + 1]))
-                    if fixation - 1 >= 0 and is_similar_word_length(individual_words[fixation - 1], lexicon[word]):
-                        if word not in allocated_dict[fixation - 2]:
-                            recognized_position_flag[fixation - 1] = True
-                            my_print(('+++ -1',
-                                      lexicon[word],
-                                      ' recognized instead ',
-                                      individual_words[fixation - 1]))
+            for word_index in range(max(fixation - 2, 0), fixation + 3):
+                # TODO PK: this has to be adjusted for the first few words, otherwise word_index is negative
+                # Workaround for negative indexes
+                if not recognized_position_flag[word_index]:
+                    # (-POS-tags)
+                    # MM first find len unrecogn. word in stim
+                    desired_length = len(individual_words[word_index])
+                    this_word = individual_words[word_index]
+                    # MM: idea is that this results in an array of 1/0 of len(lexicon), with 1=when wrd has
+                    # approx same len as to-be-recogn wrd (with 20% margin) & 0 otherwise
+                    # TODO PK: it is 15% in this moment
+                    wrdsFittingLen_np = np.array([int(is_similar_word_length(x, this_word)) for x in lexicon])
+            ##        wrdsFittingLen_np = np.where(is_similar_word_length(recognWrds_w_length, desired_length))
+                    # MM: nu op efficiente wijze vinden welk overblijvend woord hoogste
+                    # activatie heeft. Ik heb dat nu maar fictieve functie FINDMAX genoemd.
+                    # Moet in ieder geval index geven van max (dus welk woord), niet waarde (hoe actief).
+                    # MM: not sure sum exists in python - idea is,
+                    # fast check whether there is at least one 1 in wrdsFittingLen_np
+                    # PK: yes this works, you can even leave the condition since 0 will always evaluate to False
+                    # and anything above 0 will evaluate to true, any(wrdsFittingLen_np) could also work, it
+                    # evaluates to False if every entry is 0, else True
+                    if sum(wrdsFittingLen_np):
+                        # PK find the word with the highest activation in all words that have a similar length
+                        highest = np.argmax(wrdsFittingLen_np * lexicon_word_activity_np)
+                        highest_word = lexicon[highest]
+                        new_recognized_words[highest] = 1
+                        recognized_position_flag[word_index] = True
+                        #my_print('word in text: ' + str(this_word),
+                        #         'cycle:' + str(amount_of_cycles),
+                        #         "highest activation: " + str(lexicon[highest]),
+                        #         lexicon_word_activity_np[highest],
+                        #         "word_index: " + str(word_index)
+                        #         )
+                        alldata_recognized_append(highest)
+                    # MM: if the recognized word is equal to the stimulus word...
+                    # TODO this does not work correctly yet, indices can be negative, also
+                    if this_word == highest_word:
+                        alldata_truerecognized_append(highest)
+                        recognized_word_at_position_flag[word_index] = True
+                    pass
+            try:
+                print("actual word: "+str(individual_words[word_index]))
+                print("highest activation: "+str(lexicon[highest]))
+                print("\n")
+            except:
+                print("Encoding error")
+##            # MM: creates array w. 1 if recogn already in recognized_indices, 0 otherwise
+##            already_recognized_words_selection = np.in1d(recognized_lexicon_np, recognized_indices)
+##            new_recognized_words = recognized_lexicon_np[~already_recognized_words_selection]
+##
+##            for word_index in range(fixation - 2, fixation + 3):
+##                if not recognized_position_flag[word_index]:
+##                    # (-POS-tags)
+##                    desired_length = len(individual_words[word_index])
+##                    # Woorden met juiste lengtes
+##                    # 1. recognized
+##                    # Matrix 1: goede lengte, 0: verkeerde lengte
+##                    # Matrix 2: matrix 1 * recognized, alles wat overblijft is goede lengtem hoogste pakken
+##                    activation_dict = {word: value for word, value in zip(lexicon, lexicon_word_activity_np)}
+##                    activation_sorted = [(word, value) for word, value in sorted(activation_dict.items(),
+##                                                                                 key=lambda item: item[1], reverse=True)
+##                                         if len(word == desired_length)]
+##                    highest = activation_sorted[0]
+##
+##            alldata_recognized_append = all_data[fixation_counter]['recognized words indices'].append
+##            allocated_append = allocated_dict[fixation].append
+##            alldata_truerecognized_append = all_data[fixation_counter]['exact recognized words positions'].append
+##
+##            for word in new_recognized_words:
+##                my_print('recognized: ',
+##                         amount_of_cycles,
+##                         'cycle,',
+##                         lexicon[word],
+##                         lexicon_word_activity_np[word] / lexicon_thresholds_np[word],
+##                         '(ratio crt. activity to threshold)')
+##                alldata_recognized_append(word)
+##                # if yes, words are considered recognized based on similarity of word lengths
+##                # otherwise, words are considered recognized only if they match exactly
+##                # TODO think about regressions, should N be excluded from N-1 when regressed?
+##                # MM: I don't really understand what happens below, but this should be changed anyway
+##                if pm.similarity_based_recognition:
+##                    # set the recognition flag to any of the words in a similar if they
+##                    # fulfill the word length distance condition
+##                    if is_similar_word_length(individual_words[fixation], lexicon[word]):
+##                        # todo refixations cause problems, because might be that during
+##                        #  refix N+1 is recognized before N
+##                        # maybe just exclude the word during refixation
+##                        # not N-2, N-1,
+##                        if word not in already_allocated and not all_data[fixation_counter]['refixated']:
+##                            if not recognized_position_flag[fixation] or (amount_of_cycles < 1
+##                                                                          and not len(allocated_dict[fixation])):
+##                                allocated_append(word)
+##                            recognized_position_flag[fixation] = True
+##                            # todo remove last appended before actual saccade, maybe == N+1
+##                            my_print(('+++ 0',
+##                                      lexicon[word],
+##                                      ' recognized instead ',
+##                                      individual_words[fixation]))
+##                    elif shift and fixation + 1 < TOTAL_WORDS and is_similar_word_length(individual_words[fixation + 1],
+##                                                                                         lexicon[word]):
+##                        # not N-2, N-1, N
+##                        if word not in already_allocated:
+##                            recognized_position_flag[fixation + 1] = True
+##                            my_print(('+++ +1',
+##                                      lexicon[word],
+##                                      ' recognized instead ',
+##                                      individual_words[fixation + 1]))
+##                    if fixation - 1 >= 0 and is_similar_word_length(individual_words[fixation - 1], lexicon[word]):
+##                        if word not in allocated_dict[fixation - 2]:
+##                            recognized_position_flag[fixation - 1] = True
+##                            my_print(('+++ -1',
+##                                      lexicon[word],
+##                                      ' recognized instead ',
+##                                      individual_words[fixation - 1]))
+##
+##                    # TODO make vector comparison
+##                    # set the recognition flag for when the exact word is recognized
+##                    # (and store its position in the stimulus) this is also used later
+##                    # to check which words were not recognized
+##                    if individual_to_lexicon_indices[fixation] == word:
+##                        alldata_truerecognized_append(fixation)
+##                        recognized_word_at_position_flag[fixation] = True
+##                        # assert(individual_words[fixation] == lexicon[word])
+##                    elif fixation + 1 < TOTAL_WORDS and individual_to_lexicon_indices[fixation + 1] == word:
+##                        alldata_truerecognized_append(fixation + 1)
+##                        recognized_word_at_position_flag[fixation + 1] = True
+##                        # assert(individual_words[fixation+1] == lexicon[word])
+##                    elif fixation - 1 >= 0 and individual_to_lexicon_indices[fixation - 1] == word:
+##                        alldata_truerecognized_append(fixation - 1)
+##                        recognized_word_at_position_flag[fixation - 1] = True
+##                        # assert(individual_words[fixation-1] == lexicon[word])
+##                    # elif(fixation-2>=0 and individual_to_lexicon_indices[fixation-2]==word):
+##                    #     alldata_truerecognized_append(fixation-2)
+##                    #     recognized_word_at_position_flag[fixation-2] = True
+##                    # elif(fixation+2<TOTAL_WORDS and individual_to_lexicon_indices[fixation+2] == word):
+##                    #     alldata_truerecognized_append(fixation+2)
+##                    #     recognized_word_at_position_flag[fixation] = True
+##                    #     #assert(individual_words[fixation+2] == lexicon[word])
+##                    else:
+##                        # use -1 to represent words that are not in the vicinity
+##                        alldata_truerecognized_append(-1)
+##                else:
+##                    sys.exit("No dissimilar length recognition")
 
-                    # TODO make vector comparison
-                    # set the recognition flag for when the exact word is recognized
-                    # (and store its position in the stimulus) this is also used later
-                    # to check which words were not recognized
-                    if individual_to_lexicon_indices[fixation] == word:
-                        alldata_truerecognized_append(fixation)
-                        recognized_word_at_position_flag[fixation] = True
-                        # assert(individual_words[fixation] == lexicon[word])
-                    elif fixation + 1 < TOTAL_WORDS and individual_to_lexicon_indices[fixation + 1] == word:
-                        alldata_truerecognized_append(fixation + 1)
-                        recognized_word_at_position_flag[fixation + 1] = True
-                        # assert(individual_words[fixation+1] == lexicon[word])
-                    elif fixation - 1 >= 0 and individual_to_lexicon_indices[fixation - 1] == word:
-                        alldata_truerecognized_append(fixation - 1)
-                        recognized_word_at_position_flag[fixation - 1] = True
-                        # assert(individual_words[fixation-1] == lexicon[word])
-                    # elif(fixation-2>=0 and individual_to_lexicon_indices[fixation-2]==word):
-                    #     alldata_truerecognized_append(fixation-2)
-                    #     recognized_word_at_position_flag[fixation-2] = True
-                    # elif(fixation+2<TOTAL_WORDS and individual_to_lexicon_indices[fixation+2] == word):
-                    #     alldata_truerecognized_append(fixation+2)
-                    #     recognized_word_at_position_flag[fixation] = True
-                    #     #assert(individual_words[fixation+2] == lexicon[word])
-                    else:
-                        # use -1 to represent words that are not in the vicinity
-                        alldata_truerecognized_append(-1)
-                else:
-                    sys.exit("No dissimilar length recognition")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
             # -------------------------------------------------------------------------------------------------
             # Word selection and Attentional shift

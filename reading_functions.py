@@ -14,8 +14,8 @@ def my_print(*args):
         print("")
 
 
-def is_similar_word_length(word1,word2):
-    return abs(len(word1)-len(word2)) < (0.15* max(len(word1),len(word2)))
+def is_similar_word_length(word1, word2):
+    return abs(len(word1)-len(word2)) < (0.15 * max(len(word1), len(word2)))
 
 
 # returns the word center position of a surrounding word

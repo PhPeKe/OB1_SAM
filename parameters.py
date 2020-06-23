@@ -6,17 +6,17 @@ __author__ = 'Sam van Leipsig, Phillip Kersten'
 print("Parameters Initialised")
 
 # Control-flow parameters
-run_exp = True #True  # Should the reading simulation run?
-analyze_results = False #True  # Should the results be analyzed?
+run_exp = True  # Should the reading simulation run?
+analyze_results = False  # Should the results be analyzed?
 optimize = False  # Should the parameters be optimized?
 
 language = "german"  # german, dutch
-use_grammar_prob = False # True for using grammar probabilities, False for using cloze, overwritten by uniform_pred
+use_grammar_prob = False  # True for using grammar probabilities, False for using cloze, overwritten by uniform_pred
 uniform_pred = False  # Overwrites cloze/grammar probabilities with 0.25 for all words
 
 include_sacc_type_sse = True  # Include the sse score based on the saccade type probability plot
 sacc_type_objective = "total"  # If "total" all subplots will be included in the final sse,
-                               #  single objectives can be "length", "freq" or "pred"
+                               # single objectives can be "length", "freq" or "pred"
 
 include_sacc_dist_sse = True  # Include the SSE score derived from the saccade_distance.png plot
 
@@ -59,11 +59,11 @@ max_activity = 1.3
 ## Attentional width
 max_attend_width = 5.0
 min_attend_width = 3.0
-attention_skew = 7.9 # 4  #2.39 (optimal) # 1 equals symmetrical distribution # 4 (paper)
-bigram_gap = 3 # 6 (optimal) # 3 (paper)
+attention_skew = 7.9  # 4  #2.39 (optimal) # 1 equals symmetrical distribution # 4 (paper)
+bigram_gap = 3  # 6 (optimal) # 3 (paper)
 min_overlap = 2
 refix_size = 0.2
-salience_position = 4.99 # 1.29 # 5 (optimal) # 1.29 (paper)
+salience_position = 4.99  # 1.29 # 5 (optimal) # 1.29 (paper)
 corpora_repeats = 0
 
 

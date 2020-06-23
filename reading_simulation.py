@@ -552,8 +552,7 @@ def reading_simulation(filename, parameters):
         allBigrams_set = set(allBigrams)
         allMonograms_set = set(allMonograms)
 
-
-    #-------------------------------------------------------------------------------
+    # -------------------------------------------------------------------------------
 
         # At this point, stimulus, bigrams and weights for the current stimulus
         # are defined. Now prepare for entering the cycle-loop that builds word
@@ -571,7 +570,7 @@ def reading_simulation(filename, parameters):
         fixationFirstPositionRightToMiddle = None
         fixationFirstPositionLeftToMiddle = None
 
-        #substract offset to get the fixation word actual center position (used to calculate first/last index)
+        # subtract offset to get the fixation word actual center position (used to calculate first/last index)
         fixationCenter = EyePosition - int(round(OffsetFromWordCenter))
 
         centerWordFirstLetterIndex = None
@@ -636,6 +635,7 @@ def reading_simulation(filename, parameters):
             rightWordEdgeLetterIndexes.insert(0, (-1, -1))
 
         # Test rightWordEdgeLetterIndexes
+        # TODO: does this mean we always have 3 words in the stimulus?
         if fixation < TOTAL_WORDS-3:
             assert(len(rightWordEdgeLetterIndexes) == 3)
 
@@ -702,6 +702,7 @@ def reading_simulation(filename, parameters):
             # Increase salience attention-position for N+1 predictable words,
             # only used for calculation word_attention_right (salience),
             # change is reset after actual attention shift
+            pass
             if recognized_position_flag[fixation] \
                     and not shift \
                     and fixation < TOTAL_WORDS - 1 \
@@ -755,8 +756,9 @@ def reading_simulation(filename, parameters):
                         crt_fixation_word_activities[0] = wordExcitationInput
                         crt_fixation_word_activities[1] = abs(wordBigramsInhibitionInput)
                     break
-                # MM: divide input by nr ngrams, because otherwise long wrds always a lot of input
-                word_input_np = word_input_np / np.array(N_ngrams_lexicon)
+            # MM: divide input by nr ngrams, because otherwise long wrds always a lot of input
+            # TODO: should this be outside of the loop? because otherwise the first words become really small
+            word_input_np = word_input_np / np.array(N_ngrams_lexicon)
 
         # ----------------------------------------------------------------------------
 
@@ -837,7 +839,7 @@ def reading_simulation(filename, parameters):
             allocated_append = allocated_dict[fixation].append
             alldata_truerecognized_append = all_data[fixation_counter]['exact recognized words positions'].append
 
-            for word_index in range(max(fixation - 2, 0), fixation + 3):
+            for word_index in range(max(fixation - 2, 0), min(fixation + 3, len(individual_words))):
                 # TODO PK: this has to be adjusted for the first few words, otherwise word_index is negative
                 # Workaround for negative indexes
                 if not recognized_position_flag[word_index]:
@@ -876,13 +878,12 @@ def reading_simulation(filename, parameters):
                     if this_word == highest_word:
                         alldata_truerecognized_append(highest)
                         recognized_word_at_position_flag[word_index] = True
-                    pass
-            try:
-                print("actual word: "+str(individual_words[word_index]))
-                print("highest activation: "+str(lexicon[highest]))
-                print("\n")
-            except:
-                print("Encoding error")
+                    try:
+                        print("actual word: "+str(individual_words[word_index]))
+                        print("highest activation: "+str(lexicon[highest]))
+                        print("\n")
+                    except:
+                        print("Encoding error")
 ##            # MM: creates array w. 1 if recogn already in recognized_indices, 0 otherwise
 ##            already_recognized_words_selection = np.in1d(recognized_lexicon_np, recognized_indices)
 ##            new_recognized_words = recognized_lexicon_np[~already_recognized_words_selection]
@@ -980,16 +981,6 @@ def reading_simulation(filename, parameters):
 ##                        alldata_truerecognized_append(-1)
 ##                else:
 ##                    sys.exit("No dissimilar length recognition")
-
-
-
-
-
-
-
-
-
-
 
 
 

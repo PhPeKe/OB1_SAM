@@ -702,7 +702,6 @@ def reading_simulation(filename, parameters):
             # Increase salience attention-position for N+1 predictable words,
             # only used for calculation word_attention_right (salience),
             # change is reset after actual attention shift
-            pass
             if recognized_position_flag[fixation] \
                     and not shift \
                     and fixation < TOTAL_WORDS - 1 \

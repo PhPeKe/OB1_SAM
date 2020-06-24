@@ -399,6 +399,7 @@ def reading_simulation(filename, parameters):
         offset_previous = np.round(OffsetFromWordCenter)
 
         # Re-define the stimulus and calculate eye position, saccade error is implemented in OffsetFromWordCenter
+		# MM: this cannot be the most efficient way to code the stimulus
         if fixation-2 == -2:
             stimulus = " " + \
                        individual_words[fixation] + \
@@ -702,6 +703,7 @@ def reading_simulation(filename, parameters):
             # Increase salience attention-position for N+1 predictable words,
             # only used for calculation word_attention_right (salience),
             # change is reset after actual attention shift
+            pass
             if recognized_position_flag[fixation] \
                     and not shift \
                     and fixation < TOTAL_WORDS - 1 \
@@ -820,15 +822,12 @@ def reading_simulation(filename, parameters):
             all_data[fixation_counter]['fixation word activities'].append(crt_fixation_word_activities)
             all_data[fixation_counter]['fixation word activities np'] = crt_fixation_word_activities_np
 
-            # Enter any recognized word to the 'recognized words indices' list for the current fixation.
+			# Enter any recognized word to the 'recognized words indices' list for the current fixation.
+            # MM: creates array that is 1 if act(word)>thres, 0 otherwise
             recognized_lexicon_np = np.where(lexicon_word_activity_np > lexicon_thresholds_np)[0]
-            # MM: array w. indices of recogn. words
+            # MM: array w. indices of recogn. words, not sure whethre this still has a function
             recognized_indices = np.asarray(all_data[fixation_counter]['recognized words indices'], dtype=int)
 
-            # PK TODO  MM: is this pointwise multiplication? Should be and seems so
-            # PK: yes, i think if you use numpy it should be pointwise if you have two matrices with compatible
-            # shapes
-            ## recognWrds_w_length = recognized_lexicon_np * lengtes
             new_recognized_words = np.zeros(LEXICON_SIZE)
             # MM: Not sure this is correct but idea is, array of zeros of equal len as lexicon
 
@@ -846,22 +845,14 @@ def reading_simulation(filename, parameters):
                     # MM first find len unrecogn. word in stim
                     desired_length = len(individual_words[word_index])
                     this_word = individual_words[word_index]
-                    # MM: idea is that this results in an array of 1/0 of len(lexicon), with 1=when wrd has
-                    # approx same len as to-be-recogn wrd (with 20% margin) & 0 otherwise
-                    # TODO PK: it is 15% in this moment
-                    wrdsFittingLen_np = np.array([int(is_similar_word_length(x, this_word)) for x in lexicon])
+                    # MM: array with 1=wrd act above threshold, & wrd has approx same len
+                    # as to-be-recogn wrd (with 15% margin) & 0 otherwise
+                    recognWrdsFittingLen_np = recognized_lexicon_np * np.array([int(is_similar_word_length(x, this_word)) for x in lexicon])
             ##        wrdsFittingLen_np = np.where(is_similar_word_length(recognWrds_w_length, desired_length))
-                    # MM: nu op efficiente wijze vinden welk overblijvend woord hoogste
-                    # activatie heeft. Ik heb dat nu maar fictieve functie FINDMAX genoemd.
-                    # Moet in ieder geval index geven van max (dus welk woord), niet waarde (hoe actief).
-                    # MM: not sure sum exists in python - idea is,
                     # fast check whether there is at least one 1 in wrdsFittingLen_np
-                    # PK: yes this works, you can even leave the condition since 0 will always evaluate to False
-                    # and anything above 0 will evaluate to true, any(wrdsFittingLen_np) could also work, it
-                    # evaluates to False if every entry is 0, else True
-                    if sum(wrdsFittingLen_np):
+                    if sum(recognWrdsFittingLen_np):
                         # PK find the word with the highest activation in all words that have a similar length
-                        highest = np.argmax(wrdsFittingLen_np * lexicon_word_activity_np)
+                        highest = np.argmax(recognWrdsFittingLen_np * lexicon_word_activity_np)
                         highest_word = lexicon[highest]
                         new_recognized_words[highest] = 1
                         recognized_position_flag[word_index] = True
